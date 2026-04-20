@@ -1,0 +1,1204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daily Log - MerlinAI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-dark: #2A1731;
+      --primary-darker: #3B1F46;
+      --primary-base: #5D2F70;
+      --secondary-base: #FDDC8D;
+      --bg-strong: #171717;
+      --bg-surface: #262626;
+      --bg-soft: #EBEBEB;
+      --bg-weak: #F7F7F7;
+      --bg-white: #FFFFFF;
+      --text-strong: #171717;
+      --text-sub: #5C5C5C;
+      --text-soft: #A3A3A3;
+      --text-disabled: #D1D1D1;
+      --stroke-strong: #171717;
+      --stroke-sub: #D1D1D1;
+      --stroke-soft: #EBEBEB;
+      --success-dark: #0B4627;
+      --success-base: #1FC16B;
+      --success-light: #C2F5DA;
+      --success-lighter: #E0FAEC;
+      --warning-dark: #71330A;
+      --warning-base: #FA7319;
+      --warning-light: #FFD9C0;
+      --warning-lighter: #FFF3EB;
+      --error-dark: #681219;
+      --error-base: #FB3748;
+      --error-light: #FFC0C5;
+      --error-lighter: #FFEBEC;
+      --info-base: #5D2F70;
+      --info-lighter: #F6F1FA;
+      --sky-base: #47C2FF;
+      --sky-lighter: #EBF8FF;
+      --yellow-base: #F6B51E;
+      --yellow-lighter: #FFFAEB;
+      --brand-50: #F6F1FA;
+      --brand-100: #E1D3F0;
+      --brand-200: #BC9FD3;
+      --brand-400: #6E3785;
+      --brand-800: #2A1731;
+      --brand-950: #1B101E;
+      --golden-500: #FDDC8D;
+      --golden-600: #E9B669;
+      --teal-50: #E4FBF8;
+      --font-family: 'Inter', sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font-family);
+      color: var(--text-strong);
+      background: var(--brand-950);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 40px 20px;
+    }
+
+    .phone-frame {
+      width: 390px;
+      height: 844px;
+      background: var(--bg-white);
+      border-radius: 48px;
+      box-shadow: 0 0 0 2px #0D0D0D, 0 0 0 7px #2A2A2A, 0 0 0 9px #0D0D0D, 0 50px 100px rgba(0,0,0,0.5), 0 20px 40px rgba(93,47,112,0.15);
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .dynamic-island {
+      position: absolute;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 126px;
+      height: 36px;
+      background: #000;
+      border-radius: 20px;
+      z-index: 100;
+    }
+
+    /* Status bar */
+    .status-bar {
+      height: 54px;
+      padding: 14px 24px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+      z-index: 2;
+    }
+    .status-bar.on-white { background: var(--bg-white); }
+    .status-bar.on-dark { background: transparent; }
+    .status-time { font-size: 15px; font-weight: 600; }
+    .status-bar.on-white .status-time { color: var(--text-strong); }
+    .status-bar.on-dark .status-time { color: #fff; }
+    .status-icons { display: flex; align-items: center; gap: 6px; }
+    .status-icons svg { width: 18px; height: 12px; }
+    .status-bar.on-white .status-icons svg { fill: var(--text-strong); }
+    .status-bar.on-dark .status-icons svg { fill: #fff; }
+
+    /* Screens */
+    .screen { display: none; flex-direction: column; height: 100%; overflow: hidden; }
+    .screen.active { display: flex; }
+
+    /* Common top bar */
+    .top-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 4px 20px 12px;
+      background: var(--bg-white);
+      flex-shrink: 0;
+    }
+    .top-bar-back {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      border: 1px solid var(--stroke-soft);
+      background: var(--bg-white);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: var(--text-sub);
+      flex-shrink: 0;
+    }
+    .top-bar-back:active { background: var(--bg-weak); }
+    .top-bar-title { font-size: 20px; font-weight: 600; color: var(--text-strong); flex: 1; }
+    .top-bar-action {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      border: 1px solid var(--stroke-soft);
+      background: var(--bg-white);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: var(--text-sub); flex-shrink: 0;
+    }
+    .top-bar-action:active { background: var(--bg-weak); }
+
+    /* Date pills */
+    .filter-bar { padding: 0 20px 12px; background: var(--bg-white); flex-shrink: 0; }
+    .date-pills { display: flex; gap: 8px; margin-bottom: 10px; }
+    .date-pill {
+      padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 500;
+      border: 1px solid var(--stroke-soft); background: var(--bg-white);
+      color: var(--text-sub); cursor: pointer; white-space: nowrap; transition: all 0.15s;
+    }
+    .date-pill.active { background: var(--primary-base); color: #fff; border-color: var(--primary-base); }
+    .date-pill:active { transform: scale(0.97); }
+
+    /* Search */
+    .search-bar { position: relative; }
+    .search-bar input {
+      width: 100%; height: 40px; padding: 8px 12px 8px 38px;
+      border: 1px solid var(--stroke-soft); border-radius: 10px;
+      font-family: var(--font-family); font-size: 14px; color: var(--text-strong);
+      background: var(--bg-weak); outline: none;
+    }
+    .search-bar input::placeholder { color: var(--text-soft); }
+    .search-bar input:focus { border-color: var(--primary-base); background: var(--bg-white); }
+    .search-bar .s-icon {
+      position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+      color: var(--text-soft); pointer-events: none;
+    }
+
+    /* Alert banner */
+    .alert-banner {
+      margin: 10px 20px 0; padding: 12px 14px;
+      background: var(--error-lighter); border-radius: 12px;
+      border: 1px solid var(--error-light); flex-shrink: 0;
+    }
+    .alert-banner-title {
+      font-size: 13px; font-weight: 600; color: var(--error-dark);
+      margin-bottom: 6px; display: flex; align-items: center; gap: 6px;
+    }
+    .alert-item { display: flex; align-items: center; gap: 8px; padding: 5px 0; cursor: pointer; }
+    .alert-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+    .alert-dot.red { background: var(--error-base); }
+    .alert-dot.orange { background: var(--warning-base); }
+    .alert-text { font-size: 13px; color: var(--error-dark); line-height: 18px; flex: 1; }
+    .alert-arrow { color: var(--error-base); flex-shrink: 0; }
+
+    /* Scrollable area */
+    .scroll-area { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+
+    /* Project cards */
+    .projects-list { padding: 12px 20px 24px; }
+    .list-header { font-size: 13px; font-weight: 500; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+
+    .project-card {
+      background: var(--bg-white); border: 1px solid var(--stroke-soft);
+      border-radius: 14px; padding: 16px; margin-bottom: 10px;
+      cursor: pointer; transition: all 0.15s;
+    }
+    .project-card:active { transform: scale(0.985); background: var(--bg-weak); }
+    .pc-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+    .pc-name { font-size: 15px; font-weight: 600; color: var(--text-strong); line-height: 20px; margin-bottom: 2px; }
+    .pc-loc { font-size: 12px; color: var(--text-sub); display: flex; align-items: center; gap: 4px; }
+    .status-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .status-dot.green { background: var(--success-base); box-shadow: 0 0 0 3px var(--success-lighter); }
+    .status-dot.yellow { background: var(--yellow-base); box-shadow: 0 0 0 3px var(--yellow-lighter); }
+    .status-dot.red { background: var(--error-base); box-shadow: 0 0 0 3px var(--error-lighter); }
+
+    .pc-header-right { display: flex; align-items: center; gap: 8px; }
+    .pc-incident-badge {
+      display: flex; align-items: center; gap: 4px;
+      padding: 3px 8px; border-radius: 4px;
+      background: var(--error-lighter); color: var(--error-dark);
+      font-size: 11px; font-weight: 600;
+    }
+    .pc-incident-badge svg { flex-shrink: 0; }
+
+    .pc-stats { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 6px; margin-bottom: 12px; }
+    .pc-stat { text-align: center; padding: 8px 4px; background: var(--bg-weak); border-radius: 8px; }
+    .pc-stat-val { font-size: 15px; font-weight: 700; color: var(--text-strong); line-height: 1.2; }
+    .pc-stat-lbl { font-size: 10px; font-weight: 500; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.2px; margin-top: 2px; }
+
+    .pc-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 10px; border-top: 1px solid var(--stroke-soft); }
+    .pc-weather { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: var(--text-sub); }
+    .pc-updated { font-size: 12px; color: var(--text-soft); }
+
+    /* ===== SCREEN 2: DETAIL ===== */
+    .detail-header {
+      background: linear-gradient(170deg, var(--brand-950) 0%, var(--primary-dark) 35%, var(--primary-base) 100%);
+      padding: 0 20px 20px; flex-shrink: 0; position: relative; overflow: hidden;
+    }
+    .detail-header::before {
+      content: ''; position: absolute; top: -20px; right: -60px;
+      width: 200px; height: 200px; border: 2px solid rgba(253,220,141,0.06); border-radius: 50%;
+    }
+    .detail-nav { display: flex; align-items: center; justify-content: space-between; padding: 6px 0 14px; position: relative; z-index: 2; }
+    .d-back {
+      display: flex; align-items: center; gap: 6px; background: none; border: none;
+      color: #fff; font-family: var(--font-family); font-size: 14px; font-weight: 500; cursor: pointer;
+    }
+    .d-action {
+      width: 36px; height: 36px; border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.1);
+      display: flex; align-items: center; justify-content: center; cursor: pointer; color: #fff;
+    }
+    .d-info { position: relative; z-index: 2; }
+    .d-name { font-size: 20px; font-weight: 600; color: #fff; line-height: 26px; margin-bottom: 4px; }
+    .d-loc { font-size: 13px; color: var(--brand-200); display: flex; align-items: center; gap: 4px; margin-bottom: 14px; }
+    .d-stats { display: flex; gap: 6px; }
+    .d-stat {
+      flex: 1; background: rgba(255,255,255,0.12); border-radius: 10px;
+      padding: 10px; text-align: center; backdrop-filter: blur(8px);
+    }
+    .d-stat-val { font-size: 18px; font-weight: 700; color: #fff; line-height: 22px; }
+    .d-stat-lbl { font-size: 10px; font-weight: 500; color: var(--brand-200); text-transform: uppercase; letter-spacing: 0.4px; margin-top: 2px; }
+    .detail-curve { height: 20px; background: var(--bg-white); margin-top: -20px; border-radius: 20px 20px 0 0; position: relative; z-index: 3; flex-shrink: 0; }
+    .detail-content { flex: 1; overflow-y: auto; padding: 0 20px 24px; -webkit-overflow-scrolling: touch; background: var(--bg-white); }
+
+    /* Collapsible sections */
+    .section { margin-bottom: 8px; border: 1px solid var(--stroke-soft); border-radius: 12px; overflow: hidden; }
+    .section-hdr {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 16px; cursor: pointer; background: var(--bg-white); user-select: none;
+    }
+    .section-hdr:active { background: var(--bg-weak); }
+    .sh-left { display: flex; align-items: center; gap: 10px; }
+    .sh-icon { width: 34px; height: 34px; border-radius: 9px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .sh-icon.blue { background: var(--sky-lighter); color: #1F7EAD; }
+    .sh-icon.green { background: var(--success-lighter); color: var(--success-dark); }
+    .sh-icon.orange { background: var(--warning-lighter); color: var(--warning-dark); }
+    .sh-icon.purple { background: var(--info-lighter); color: var(--primary-base); }
+    .sh-icon.red { background: var(--error-lighter); color: var(--error-dark); }
+    .sh-icon.teal { background: var(--teal-50); color: #0B463E; }
+    .sh-icon.sky { background: var(--sky-lighter); color: #124B68; }
+    .sh-title { font-size: 14px; font-weight: 600; color: var(--text-strong); }
+    .sh-sub { font-size: 12px; color: var(--text-sub); margin-top: 1px; }
+    .sh-right { display: flex; align-items: center; gap: 8px; }
+    .sh-badge { padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 500; }
+    .sh-badge.green { background: var(--success-lighter); color: var(--success-dark); }
+    .sh-badge.orange { background: var(--warning-lighter); color: var(--warning-dark); }
+    .sh-badge.red { background: var(--error-lighter); color: var(--error-dark); }
+    .sh-badge.blue { background: var(--sky-lighter); color: #124B68; }
+    .sh-badge.gray { background: var(--bg-weak); color: var(--text-sub); }
+    .sh-chev { color: var(--text-soft); transition: transform 0.2s; flex-shrink: 0; }
+    .section.collapsed .sh-chev { transform: rotate(-90deg); }
+    .section-body { padding: 0 16px 16px; border-top: 1px solid var(--stroke-soft); }
+    .section.collapsed .section-body { display: none; }
+
+    /* View more button */
+    .view-more-btn {
+      display: flex; align-items: center; justify-content: center; gap: 4px;
+      width: 100%; padding: 10px; margin-top: 10px;
+      border: 1px dashed var(--stroke-sub); border-radius: 8px;
+      background: var(--bg-weak); color: var(--primary-base);
+      font-family: var(--font-family); font-size: 13px; font-weight: 500;
+      cursor: pointer; transition: all 0.15s;
+    }
+    .view-more-btn:active { background: var(--info-lighter); }
+
+    /* Filter chips */
+    .filter-chips { display: flex; gap: 6px; padding: 12px 0 10px; overflow-x: auto; }
+    .chip {
+      padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 500;
+      border: 1px solid var(--stroke-soft); background: var(--bg-white); color: var(--text-sub);
+      cursor: pointer; white-space: nowrap;
+    }
+    .chip.active { background: var(--primary-base); color: #fff; border-color: var(--primary-base); }
+
+    /* Timeline */
+    .tl-entry { display: flex; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--stroke-soft); }
+    .tl-entry:last-child { border-bottom: none; }
+    .tl-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 6px; flex-shrink: 0; }
+    .tl-dot.note { background: var(--sky-base); }
+    .tl-dot.progress { background: var(--success-base); }
+    .tl-dot.delivery { background: var(--primary-base); }
+    .tl-dot.incident { background: var(--error-base); }
+    .tl-dot.photo { background: var(--golden-600); }
+    .tl-content { flex: 1; min-width: 0; }
+    .tl-meta { display: flex; align-items: center; gap: 6px; margin-bottom: 3px; flex-wrap: wrap; }
+    .tl-time { font-size: 12px; font-weight: 500; color: var(--text-soft); }
+    .tl-author { font-size: 12px; color: var(--text-sub); }
+    .tl-cat { padding: 1px 6px; border-radius: 4px; font-size: 10px; font-weight: 500; }
+    .tl-cat.progress { background: var(--success-lighter); color: var(--success-dark); }
+    .tl-cat.note { background: var(--sky-lighter); color: #124B68; }
+    .tl-cat.delivery { background: var(--info-lighter); color: var(--primary-base); }
+    .tl-cat.incident { background: var(--error-lighter); color: var(--error-dark); }
+    .tl-cat.photo { background: var(--yellow-lighter); color: #624C18; }
+    .tl-text { font-size: 13px; color: var(--text-strong); line-height: 18px; }
+    .tl-photos { display: flex; gap: 6px; margin-top: 8px; }
+    .tl-photo {
+      width: 52px; height: 52px; border-radius: 8px; display: flex;
+      align-items: center; justify-content: center; color: var(--text-soft);
+    }
+
+    /* Worker list */
+    .worker-summary { display: flex; gap: 12px; padding: 14px 0 10px; }
+    .worker-stat-box { flex: 1; padding: 12px; background: var(--bg-weak); border-radius: 10px; text-align: center; }
+    .ws-val { font-size: 20px; font-weight: 700; color: var(--text-strong); }
+    .ws-lbl { font-size: 11px; color: var(--text-sub); margin-top: 2px; }
+    .worker-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 0; border-bottom: 1px solid var(--stroke-soft);
+    }
+    .worker-row:last-of-type { border-bottom: none; }
+    .worker-avatar {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: var(--info-lighter); display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 600; color: var(--primary-base); flex-shrink: 0;
+    }
+    .worker-info { flex: 1; }
+    .worker-name { font-size: 13px; font-weight: 500; color: var(--text-strong); }
+    .worker-trade { font-size: 12px; color: var(--text-sub); }
+    .worker-hours { font-size: 13px; font-weight: 600; color: var(--text-strong); text-align: right; }
+    .worker-ot { font-size: 10px; color: var(--warning-base); font-weight: 500; }
+
+    /* Task items */
+    .task-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--stroke-soft); }
+    .task-item:last-child { border-bottom: none; }
+    .task-icon { width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-top: 1px; flex-shrink: 0; }
+    .task-icon.done { background: var(--success-base); color: #fff; }
+    .task-icon.prog { background: var(--sky-base); color: #fff; }
+    .task-icon.blocked { background: var(--error-base); color: #fff; }
+    .task-info { flex: 1; }
+    .task-name { font-size: 13px; font-weight: 500; color: var(--text-strong); line-height: 18px; }
+    .task-sub { font-size: 12px; color: var(--text-sub); margin-top: 1px; }
+    .task-pct { font-size: 13px; font-weight: 600; }
+    .task-pct.complete { color: var(--success-base); }
+    .task-pct.wip { color: var(--text-sub); }
+    .task-pct.blk { color: var(--error-base); }
+
+    /* Work order items */
+    .wo-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 12px; background: var(--bg-weak); border-radius: 8px; margin-bottom: 6px;
+    }
+    .wo-info { flex: 1; }
+    .wo-title { font-size: 13px; font-weight: 500; color: var(--text-strong); }
+    .wo-meta { font-size: 12px; color: var(--text-sub); margin-top: 2px; }
+    .wo-badge { padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 500; }
+    .wo-badge.done { background: var(--success-lighter); color: var(--success-dark); }
+    .wo-badge.wip { background: var(--sky-lighter); color: #124B68; }
+    .wo-badge.pending { background: var(--warning-lighter); color: var(--warning-dark); }
+
+    /* Delivery items */
+    .del-group { font-size: 12px; font-weight: 600; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.4px; padding: 12px 0 8px; }
+    .del-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; background: var(--bg-weak); border-radius: 8px; margin-bottom: 6px; }
+    .del-info { flex: 1; }
+    .del-name { font-size: 13px; font-weight: 500; color: var(--text-strong); }
+    .del-meta { font-size: 12px; color: var(--text-sub); margin-top: 2px; }
+    .del-badge { padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 500; }
+    .del-badge.received { background: var(--success-lighter); color: var(--success-dark); }
+    .del-badge.pending { background: var(--warning-lighter); color: var(--warning-dark); }
+    .del-badge.missed { background: var(--error-lighter); color: var(--error-dark); }
+
+    /* Equipment */
+    .eq-item { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--stroke-soft); }
+    .eq-item:last-child { border-bottom: none; }
+    .eq-icon { width: 36px; height: 36px; border-radius: 9px; background: var(--bg-weak); display: flex; align-items: center; justify-content: center; color: var(--text-sub); flex-shrink: 0; }
+    .eq-info { flex: 1; }
+    .eq-name { font-size: 13px; font-weight: 500; color: var(--text-strong); }
+    .eq-meta { font-size: 12px; color: var(--text-sub); margin-top: 1px; }
+    .eq-status { display: flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 500; }
+    .eq-dot { width: 6px; height: 6px; border-radius: 50%; }
+    .eq-dot.active { background: var(--success-base); }
+    .eq-dot.idle { background: var(--text-soft); }
+
+    /* Incidents */
+    .safety-check {
+      display: flex; align-items: center; gap: 8px; padding: 12px;
+      border-radius: 8px; margin: 12px 0 10px;
+    }
+    .safety-check.ok { background: var(--success-lighter); }
+    .safety-check-text { font-size: 13px; font-weight: 500; }
+    .safety-check.ok .safety-check-text { color: var(--success-dark); }
+    .incident-card {
+      padding: 12px; border-radius: 10px; border: 1px solid var(--error-light);
+      background: var(--error-lighter); margin-bottom: 8px;
+    }
+    .inc-hdr { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+    .inc-sev { padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+    .inc-sev.near-miss { background: var(--warning-lighter); color: var(--warning-dark); border: 1px solid var(--warning-light); }
+    .inc-time { font-size: 12px; color: var(--text-sub); }
+    .inc-desc { font-size: 13px; color: var(--text-strong); line-height: 18px; margin-bottom: 6px; }
+    .inc-action { font-size: 12px; color: var(--text-sub); font-style: italic; }
+
+    /* Weather */
+    .weather-main { display: flex; align-items: center; gap: 16px; padding: 14px 0 12px; }
+    .w-temp { font-size: 36px; font-weight: 700; color: var(--text-strong); line-height: 1; }
+    .w-cond { font-size: 14px; font-weight: 500; color: var(--text-strong); }
+    .w-loc { font-size: 12px; color: var(--text-sub); margin-top: 2px; }
+    .w-details { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+    .w-detail { padding: 10px; background: var(--bg-weak); border-radius: 8px; text-align: center; }
+    .w-detail-val { font-size: 14px; font-weight: 600; color: var(--text-strong); }
+    .w-detail-lbl { font-size: 11px; color: var(--text-sub); margin-top: 2px; }
+    .w-7day { display: flex; gap: 4px; padding-top: 12px; border-top: 1px solid var(--stroke-soft); }
+    .w-day { flex: 1; text-align: center; padding: 8px 4px; border-radius: 8px; }
+    .w-day.today { background: var(--info-lighter); }
+    .w-day-name { font-size: 10px; font-weight: 500; color: var(--text-soft); text-transform: uppercase; }
+    .w-day-icon { font-size: 16px; margin: 4px 0; }
+    .w-day-temp { font-size: 11px; font-weight: 600; color: var(--text-strong); }
+
+    /* ===== SCREEN 3: REPORTS ===== */
+    .report-tabs {
+      display: flex; background: var(--bg-weak); border-radius: 10px;
+      padding: 3px; margin: 0 20px 12px;
+    }
+    .r-tab {
+      flex: 1; padding: 8px 12px; text-align: center;
+      font-size: 13px; font-weight: 500; color: var(--text-sub);
+      border-radius: 8px; cursor: pointer;
+    }
+    .r-tab.active { background: var(--bg-white); color: var(--text-strong); box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+
+    .gen-cta {
+      margin: 0 20px 14px; padding: 20px;
+      background: linear-gradient(135deg, var(--info-lighter), #fff);
+      border: 1px solid var(--brand-100); border-radius: 14px; text-align: center;
+    }
+    .gen-cta-title { font-size: 15px; font-weight: 600; color: var(--text-strong); margin-bottom: 4px; }
+    .gen-cta-desc { font-size: 13px; color: var(--text-sub); margin-bottom: 14px; }
+
+    .btn-primary-fill {
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      width: 100%; height: 40px; border-radius: 10px; border: none;
+      background: var(--primary-base); color: #fff; font-family: var(--font-family);
+      font-size: 14px; font-weight: 500; cursor: pointer;
+    }
+    .btn-primary-fill:active { background: var(--primary-darker); }
+
+    .rpt-preview { border: 1px solid var(--stroke-soft); border-radius: 14px; overflow: hidden; margin: 0 20px 12px; }
+    .rpt-hdr { padding: 16px; background: linear-gradient(135deg, var(--brand-950), var(--primary-dark)); color: #fff; }
+    .rpt-type { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; color: var(--golden-500); margin-bottom: 4px; }
+    .rpt-title { font-size: 16px; font-weight: 600; line-height: 22px; margin-bottom: 4px; }
+    .rpt-date { font-size: 12px; color: var(--brand-200); }
+    .rpt-body { padding: 14px 16px; }
+    .rpt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+    .rpt-stat { padding: 12px; border-radius: 10px; background: var(--bg-weak); }
+    .rpt-stat-lbl { font-size: 11px; font-weight: 500; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.3px; }
+    .rpt-stat-val { font-size: 18px; font-weight: 700; color: var(--text-strong); margin-top: 2px; }
+    .rpt-stat-chg { font-size: 11px; font-weight: 500; margin-top: 2px; }
+    .rpt-stat-chg.up { color: var(--success-base); }
+    .rpt-stat-chg.down { color: var(--error-base); }
+    .rpt-stat-chg.neutral { color: var(--text-soft); }
+
+    /* Mini chart */
+    .mini-chart-title { font-size: 12px; font-weight: 600; color: var(--text-sub); margin-bottom: 8px; }
+    .chart-bars { display: flex; align-items: flex-end; gap: 6px; height: 50px; margin-bottom: 14px; }
+    .chart-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .chart-bar { width: 100%; border-radius: 3px 3px 0 0; min-height: 4px; background: var(--primary-base); }
+    .chart-lbl { font-size: 9px; color: var(--text-soft); font-weight: 500; }
+
+    /* Report summary sections */
+    .rpt-section { margin-bottom: 12px; }
+    .rpt-section-title { font-size: 12px; font-weight: 600; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 6px; }
+    .rpt-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; font-size: 13px; }
+    .rpt-row-label { color: var(--text-sub); }
+    .rpt-row-value { font-weight: 600; color: var(--text-strong); }
+
+    .rpt-actions { display: flex; gap: 8px; padding: 0 16px 14px; }
+    .rpt-btn {
+      display: flex; align-items: center; justify-content: center; gap: 4px;
+      height: 36px; border-radius: 8px; font-family: var(--font-family);
+      font-size: 13px; font-weight: 500; cursor: pointer; padding: 0 14px; border: none;
+    }
+    .rpt-btn.primary { flex: 1; background: var(--primary-base); color: #fff; }
+    .rpt-btn.outline { background: transparent; color: var(--text-sub); border: 1px solid var(--stroke-soft); }
+
+    /* Report history */
+    .rpt-history { padding: 0 20px 24px; }
+    .rpt-hist-title { font-size: 13px; font-weight: 600; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 10px; }
+    .rpt-hist-item {
+      display: flex; align-items: center; gap: 12px; padding: 12px;
+      border: 1px solid var(--stroke-soft); border-radius: 10px; margin-bottom: 8px; cursor: pointer;
+    }
+    .rpt-hist-item:active { background: var(--bg-weak); }
+    .rpt-hist-icon {
+      width: 40px; height: 40px; border-radius: 10px; background: var(--info-lighter);
+      display: flex; align-items: center; justify-content: center; color: var(--primary-base); flex-shrink: 0;
+    }
+    .rpt-hist-info { flex: 1; }
+    .rpt-hist-name { font-size: 14px; font-weight: 500; color: var(--text-strong); }
+    .rpt-hist-meta { font-size: 12px; color: var(--text-sub); margin-top: 2px; }
+    .mini-btn {
+      width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--stroke-soft);
+      background: var(--bg-white); display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: var(--text-sub);
+    }
+
+    /* Home indicator */
+    .home-ind { height: 34px; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 8px; flex-shrink: 0; background: var(--bg-white); }
+    .home-ind-bar { width: 134px; height: 5px; background: var(--bg-strong); border-radius: 100px; opacity: 0.18; }
+
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+    .screen.active .scroll-area, .screen.active .detail-content { animation: fadeUp 0.3s ease-out; }
+
+    /* SVG helpers */
+    .ico { display: inline-flex; align-items: center; justify-content: center; }
+  </style>
+</head>
+<body>
+
+<div class="phone-frame">
+  <div class="dynamic-island"></div>
+
+  <!-- ===== SCREEN 1: PROJECT LIST ===== -->
+  <div class="screen active" id="s-home">
+    <div class="status-bar on-white">
+      <span class="status-time">9:41</span>
+      <div class="status-icons">
+        <svg viewBox="0 0 18 12"><rect x="0" y="9" width="3" height="3" rx=".5"/><rect x="4.5" y="6" width="3" height="6" rx=".5"/><rect x="9" y="3" width="3" height="9" rx=".5"/><rect x="13.5" y="0" width="3" height="12" rx=".5"/></svg>
+        <svg viewBox="0 0 18 12"><circle cx="9" cy="11" r="1"/><path d="M5.93 7.82a5 5 0 017.14 0" stroke="currentColor" fill="none" stroke-width="1.2" stroke-linecap="round"/><path d="M2.5 5a9 9 0 0113 0" stroke="currentColor" fill="none" stroke-width="1.2" stroke-linecap="round"/></svg>
+        <svg viewBox="0 0 27 13" width="27" height="13"><rect x=".5" y=".5" width="22" height="12" rx="2.5" stroke="currentColor" fill="none" stroke-opacity=".35"/><rect x="2" y="2" width="19" height="9" rx="1.5"/><path d="M24 4.5v4a1.5 1.5 0 000-4z" fill-opacity=".4"/></svg>
+      </div>
+    </div>
+
+    <div class="top-bar">
+      <button class="top-bar-back" onclick="alert('Navigate to main app dashboard — prototype only')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <span class="top-bar-title">Daily Log</span>
+      <button class="top-bar-action" onclick="showScreen('reports')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      </button>
+    </div>
+
+    <div class="filter-bar">
+      <div class="date-pills">
+        <div class="date-pill active" onclick="pickPill(this)">Today</div>
+        <div class="date-pill" onclick="pickPill(this)">Last 7 Days</div>
+        <div class="date-pill" onclick="pickPill(this)">This Month</div>
+        <div class="date-pill" onclick="pickPill(this)">Custom</div>
+      </div>
+      <div class="search-bar">
+        <svg class="s-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" placeholder="Search projects...">
+      </div>
+    </div>
+
+    <!-- Alerts -->
+    <div class="alert-banner">
+      <div class="alert-banner-title">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        3 items need attention
+      </div>
+      <div class="alert-item" onclick="showScreen('detail')">
+        <span class="alert-dot red"></span>
+        <span class="alert-text">1 incident at Skyline Tower</span>
+        <svg class="alert-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+      <div class="alert-item">
+        <span class="alert-dot orange"></span>
+        <span class="alert-text">2 deliveries delayed at Green Valley</span>
+        <svg class="alert-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+      <div class="alert-item">
+        <span class="alert-dot orange"></span>
+        <span class="alert-text">Equipment breakdown at Metro Hub</span>
+        <svg class="alert-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+    </div>
+
+    <!-- Project Cards -->
+    <div class="scroll-area">
+      <div class="projects-list">
+        <div class="list-header">5 Active Projects</div>
+
+        <div class="project-card" onclick="showScreen('detail')">
+          <div class="pc-header">
+            <div><div class="pc-name">Skyline Tower - Phase 2</div><div class="pc-loc"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Pune, Maharashtra</div></div>
+            <div class="pc-header-right">
+              <span class="pc-incident-badge"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>1 Incident</span>
+              <span class="status-dot red"></span>
+            </div>
+          </div>
+          <div class="pc-stats">
+            <div class="pc-stat"><div class="pc-stat-val">45</div><div class="pc-stat-lbl">Workers</div></div>
+            <div class="pc-stat"><div class="pc-stat-val">324</div><div class="pc-stat-lbl">Hours</div></div>
+            <div class="pc-stat"><div class="pc-stat-val">5/8</div><div class="pc-stat-lbl">Tasks</div></div>
+            <div class="pc-stat"><div class="pc-stat-val">3/4</div><div class="pc-stat-lbl">W.Orders</div></div>
+          </div>
+          <div class="pc-footer">
+            <div class="pc-weather">&#9728;&#65039; 34°C Sunny</div>
+            <span class="pc-updated">25 min ago</span>
+          </div>
+        </div>
+
+        <div class="project-card" onclick="showScreen('detail')">
+          <div class="pc-header">
+            <div><div class="pc-name">Green Valley Residences</div><div class="pc-loc"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Mumbai, Maharashtra</div></div>
+            <div class="pc-header-right"><span class="status-dot yellow"></span></div>
+          </div>
+          <div class="pc-stats">
+            <div class="pc-stat"><div class="pc-stat-val">38</div><div class="pc-stat-lbl">Workers</div></div>
+            <div class="pc-stat"><div class="pc-stat-val">285</div><div class="pc-stat-lbl">Hours</div></div>
+            <div class="pc-stat"><div class="pc-stat-val">7/10</div><div class="pc-stat-lbl">Tasks</div></div>
+            <div class="pc-stat"><div class="pc-stat-val">2/3</div><div class="pc-stat-lbl">W.Orders</div></div>
+          </div>
+          <div class="pc-footer">
+            <div class="pc-weather">&#9925; 31°C Cloudy</div>
+            <span class="pc-updated">1 hr ago</span>
+          </div>
+        </div>
+
+        <div class="project-card" onclick="showScreen('detail')">
+          <div class="pc-header">
+            <div><div class="pc-name">Metro Hub Commercial</div><div class="pc-loc"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Nashik, Maharashtra</div></div>
+            <div class="pc-header-right"><span class="status-dot yellow"></span></div>
+          </div>
+          <div class="pc-stats">
+            <div class="pc-stat"><div class="pc-stat-val">22</div><div class="pc-stat-lbl">Workers</div></div>
+            <div class="pc-stat"><div class="pc-stat-val">168</div><div class="pc-stat-lbl">Hours</div></div>
+            <div class="pc-stat"><div class="pc-stat-val">4/6</div><div class="pc-stat-lbl">Tasks</div></div>
+            <div class="pc-stat"><div class="pc-stat-val">1/2</div><div class="pc-stat-lbl">W.Orders</div></div>
+          </div>
+          <div class="pc-footer">
+            <div class="pc-weather">&#9728;&#65039; 36°C Hot</div>
+            <span class="pc-updated">2 hrs ago</span>
+          </div>
+        </div>
+
+        <div class="project-card" onclick="showScreen('detail')">
+          <div class="pc-header">
+            <div><div class="pc-name">Riverside Villas</div><div class="pc-loc"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Lonavala, Maharashtra</div></div>
+            <div class="pc-header-right"><span class="status-dot green"></span></div>
+          </div>
+          <div class="pc-stats">
+            <div class="pc-stat"><div class="pc-stat-val">18</div><div class="pc-stat-lbl">Workers</div></div>
+            <div class="pc-stat"><div class="pc-stat-val">142</div><div class="pc-stat-lbl">Hours</div></div>
+            <div class="pc-stat"><div class="pc-stat-val">6/7</div><div class="pc-stat-lbl">Tasks</div></div>
+            <div class="pc-stat"><div class="pc-stat-val">2/2</div><div class="pc-stat-lbl">W.Orders</div></div>
+          </div>
+          <div class="pc-footer">
+            <div class="pc-weather">&#127782;&#65039; 28°C Rainy</div>
+            <span class="pc-updated">45 min ago</span>
+          </div>
+        </div>
+
+        <div class="project-card" onclick="showScreen('detail')">
+          <div class="pc-header">
+            <div><div class="pc-name">Horizon Office Park</div><div class="pc-loc"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Hinjewadi, Pune</div></div>
+            <div class="pc-header-right"><span class="status-dot green"></span></div>
+          </div>
+          <div class="pc-stats">
+            <div class="pc-stat"><div class="pc-stat-val">30</div><div class="pc-stat-lbl">Workers</div></div>
+            <div class="pc-stat"><div class="pc-stat-val">234</div><div class="pc-stat-lbl">Hours</div></div>
+            <div class="pc-stat"><div class="pc-stat-val">9/10</div><div class="pc-stat-lbl">Tasks</div></div>
+            <div class="pc-stat"><div class="pc-stat-val">4/4</div><div class="pc-stat-lbl">W.Orders</div></div>
+          </div>
+          <div class="pc-footer">
+            <div class="pc-weather">&#9728;&#65039; 33°C Sunny</div>
+            <span class="pc-updated">10 min ago</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="home-ind"><div class="home-ind-bar"></div></div>
+  </div>
+
+  <!-- ===== SCREEN 2: PROJECT DETAIL ===== -->
+  <div class="screen" id="s-detail">
+    <div class="detail-header">
+      <div class="status-bar on-dark">
+        <span class="status-time">9:41</span>
+        <div class="status-icons">
+          <svg viewBox="0 0 18 12"><rect x="0" y="9" width="3" height="3" rx=".5" fill="white"/><rect x="4.5" y="6" width="3" height="6" rx=".5" fill="white"/><rect x="9" y="3" width="3" height="9" rx=".5" fill="white"/><rect x="13.5" y="0" width="3" height="12" rx=".5" fill="white"/></svg>
+          <svg viewBox="0 0 18 12"><circle cx="9" cy="11" r="1" fill="white"/><path d="M5.93 7.82a5 5 0 017.14 0" stroke="white" fill="none" stroke-width="1.2" stroke-linecap="round"/><path d="M2.5 5a9 9 0 0113 0" stroke="white" fill="none" stroke-width="1.2" stroke-linecap="round"/></svg>
+          <svg viewBox="0 0 27 13" width="27" height="13"><rect x=".5" y=".5" width="22" height="12" rx="2.5" stroke="white" fill="none" stroke-opacity=".35"/><rect x="2" y="2" width="19" height="9" rx="1.5" fill="white"/><path d="M24 4.5v4a1.5 1.5 0 000-4z" fill="white" fill-opacity=".4"/></svg>
+        </div>
+      </div>
+      <div class="detail-nav">
+        <button class="d-back" onclick="showScreen('home')">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>Back
+        </button>
+        <button class="d-action" onclick="showScreen('reports')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        </button>
+      </div>
+      <div class="d-info">
+        <div class="d-name">Skyline Tower - Phase 2</div>
+        <div class="d-loc">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Pune, MH &middot; Rajesh K. (Supervisor)
+        </div>
+        <div class="d-stats">
+          <div class="d-stat"><div class="d-stat-val">45</div><div class="d-stat-lbl">Workers</div></div>
+          <div class="d-stat"><div class="d-stat-val">324</div><div class="d-stat-lbl">Hours</div></div>
+          <div class="d-stat"><div class="d-stat-val">5/8</div><div class="d-stat-lbl">Tasks</div></div>
+          <div class="d-stat"><div class="d-stat-val">3/4</div><div class="d-stat-lbl">W.Orders</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="detail-curve"></div>
+
+    <div class="detail-content">
+
+      <!-- Activity Timeline -->
+      <div class="section" id="sec-activity">
+        <div class="section-hdr" onclick="toggle('sec-activity')">
+          <div class="sh-left">
+            <div class="sh-icon blue"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+            <div><div class="sh-title">Activity Timeline</div><div class="sh-sub">12 entries today</div></div>
+          </div>
+          <div class="sh-right"><svg class="sh-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div>
+        </div>
+        <div class="section-body">
+          <div class="filter-chips">
+            <div class="chip active" onclick="pickChip(this)">All</div>
+            <div class="chip" onclick="pickChip(this)">Notes</div>
+            <div class="chip" onclick="pickChip(this)">Photos</div>
+            <div class="chip" onclick="pickChip(this)">Deliveries</div>
+            <div class="chip" onclick="pickChip(this)">Incidents</div>
+          </div>
+          <div class="tl-entry">
+            <div class="tl-dot incident"></div>
+            <div class="tl-content">
+              <div class="tl-meta"><span class="tl-time">3:15 PM</span><span class="tl-cat incident">Incident</span></div>
+              <div class="tl-author">Rajesh K. - Supervisor</div>
+              <div class="tl-text">Worker slipped on wet surface near Block B. Minor bruise on left arm. First aid administered on site.</div>
+            </div>
+          </div>
+          <div class="tl-entry">
+            <div class="tl-dot progress"></div>
+            <div class="tl-content">
+              <div class="tl-meta"><span class="tl-time">2:30 PM</span><span class="tl-cat progress">Progress</span></div>
+              <div class="tl-author">Rajesh K. - Supervisor</div>
+              <div class="tl-text">3rd floor slab casting completed. Curing started. Expected finish by Apr 23.</div>
+              <div class="tl-photos">
+                <div class="tl-photo" style="background:linear-gradient(135deg,#E1D3F0,#F6F1FA);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
+                <div class="tl-photo" style="background:linear-gradient(135deg,#E1D3F0,#F6F1FA);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
+              </div>
+            </div>
+          </div>
+          <div class="tl-entry">
+            <div class="tl-dot delivery"></div>
+            <div class="tl-content">
+              <div class="tl-meta"><span class="tl-time">11:45 AM</span><span class="tl-cat delivery">Delivery</span></div>
+              <div class="tl-author">Rajesh K. - Supervisor</div>
+              <div class="tl-text">TMT Steel bars (12mm) — 5 tonnes delivered. Quality accepted. PO #2847.</div>
+            </div>
+          </div>
+          <div class="tl-entry">
+            <div class="tl-dot note"></div>
+            <div class="tl-content">
+              <div class="tl-meta"><span class="tl-time">9:20 AM</span><span class="tl-cat note">Note</span></div>
+              <div class="tl-author">Rajesh K. - Supervisor</div>
+              <div class="tl-text">Morning briefing done. 45 workers on site today. All areas accessible.</div>
+            </div>
+          </div>
+          <button class="view-more-btn" onclick="alert('View all 12 activity entries — prototype only')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            View More (8 more entries)
+          </button>
+        </div>
+      </div>
+
+      <!-- Workers -->
+      <div class="section" id="sec-workers">
+        <div class="section-hdr" onclick="toggle('sec-workers')">
+          <div class="sh-left">
+            <div class="sh-icon green"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></div>
+            <div><div class="sh-title">Workers</div><div class="sh-sub">45 workers &middot; 324 hrs logged</div></div>
+          </div>
+          <div class="sh-right">
+            <span class="sh-badge green">45</span>
+            <svg class="sh-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+        </div>
+        <div class="section-body">
+          <div class="worker-summary">
+            <div class="worker-stat-box"><div class="ws-val">45</div><div class="ws-lbl">Total Workers</div></div>
+            <div class="worker-stat-box"><div class="ws-val">324</div><div class="ws-lbl">Total Hours</div></div>
+            <div class="worker-stat-box"><div class="ws-val">18</div><div class="ws-lbl">Overtime Hrs</div></div>
+          </div>
+
+          <div class="worker-row">
+            <div class="worker-avatar">SM</div>
+            <div class="worker-info"><div class="worker-name">Suresh Mane</div><div class="worker-trade">Mason</div></div>
+            <div style="text-align:right"><div class="worker-hours">9.5 hrs</div><div class="worker-ot">+1.5 OT</div></div>
+          </div>
+          <div class="worker-row">
+            <div class="worker-avatar">AP</div>
+            <div class="worker-info"><div class="worker-name">Amit Pawar</div><div class="worker-trade">Electrician</div></div>
+            <div style="text-align:right"><div class="worker-hours">8 hrs</div></div>
+          </div>
+          <div class="worker-row">
+            <div class="worker-avatar">RD</div>
+            <div class="worker-info"><div class="worker-name">Ravi Deshmukh</div><div class="worker-trade">Plumber</div></div>
+            <div style="text-align:right"><div class="worker-hours">8 hrs</div></div>
+          </div>
+          <div class="worker-row">
+            <div class="worker-avatar">VK</div>
+            <div class="worker-info"><div class="worker-name">Vijay Kulkarni</div><div class="worker-trade">Carpenter</div></div>
+            <div style="text-align:right"><div class="worker-hours">7.5 hrs</div></div>
+          </div>
+          <div class="worker-row">
+            <div class="worker-avatar">GR</div>
+            <div class="worker-info"><div class="worker-name">Ganesh Rane</div><div class="worker-trade">Laborer</div></div>
+            <div style="text-align:right"><div class="worker-hours">9 hrs</div><div class="worker-ot">+1 OT</div></div>
+          </div>
+          <button class="view-more-btn" onclick="alert('View all 45 workers — prototype only')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            View More (40 more workers)
+          </button>
+        </div>
+      </div>
+
+      <!-- Tasks & Progress -->
+      <div class="section" id="sec-tasks">
+        <div class="section-hdr" onclick="toggle('sec-tasks')">
+          <div class="sh-left">
+            <div class="sh-icon purple"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></div>
+            <div><div class="sh-title">Tasks & Progress</div><div class="sh-sub">5 of 8 completed</div></div>
+          </div>
+          <div class="sh-right">
+            <span class="sh-badge blue">5/8</span>
+            <svg class="sh-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+        </div>
+        <div class="section-body" style="padding-top:12px;">
+          <div class="task-item">
+            <div class="task-icon done"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div class="task-info"><div class="task-name">3rd floor slab casting</div><div class="task-sub">Team A &middot; Suresh M.</div></div>
+            <span class="task-pct complete">100%</span>
+          </div>
+          <div class="task-item">
+            <div class="task-icon done"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div class="task-info"><div class="task-name">Electrical conduit — Block A</div><div class="task-sub">Electrical Team &middot; Amit P.</div></div>
+            <span class="task-pct complete">100%</span>
+          </div>
+          <div class="task-item">
+            <div class="task-icon prog"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><circle cx="12" cy="12" r="1"/></svg></div>
+            <div class="task-info"><div class="task-name">Formwork — 4th floor columns</div><div class="task-sub">Team B &middot; Vijay K.</div></div>
+            <span class="task-pct wip">60%</span>
+          </div>
+          <div class="task-item">
+            <div class="task-icon blocked"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+            <div class="task-info"><div class="task-name">Window frame installation</div><div class="task-sub">Blocked: frames not delivered</div></div>
+            <span class="task-pct blk">0%</span>
+          </div>
+          <button class="view-more-btn" onclick="alert('View all 8 tasks — prototype only')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            View More (4 more tasks)
+          </button>
+        </div>
+      </div>
+
+      <!-- Work Orders -->
+      <div class="section" id="sec-wo">
+        <div class="section-hdr" onclick="toggle('sec-wo')">
+          <div class="sh-left">
+            <div class="sh-icon teal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg></div>
+            <div><div class="sh-title">Work Orders</div><div class="sh-sub">3 of 4 completed</div></div>
+          </div>
+          <div class="sh-right">
+            <span class="sh-badge green">3/4</span>
+            <svg class="sh-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+        </div>
+        <div class="section-body" style="padding-top:12px;">
+          <div class="wo-item">
+            <div class="wo-info"><div class="wo-title">WO-1042: RCC Slab — 3rd Floor</div><div class="wo-meta">Assigned: Team A &middot; Apr 18</div></div>
+            <span class="wo-badge done">Completed</span>
+          </div>
+          <div class="wo-item">
+            <div class="wo-info"><div class="wo-title">WO-1038: Electrical Rough-in Block A</div><div class="wo-meta">Assigned: Electrical Team &middot; Apr 16</div></div>
+            <span class="wo-badge done">Completed</span>
+          </div>
+          <div class="wo-item">
+            <div class="wo-info"><div class="wo-title">WO-1045: Plumbing — 2nd Floor</div><div class="wo-meta">Assigned: Plumbing Team &middot; Apr 19</div></div>
+            <span class="wo-badge done">Completed</span>
+          </div>
+          <div class="wo-item" style="border:1px solid var(--sky-lighter);">
+            <div class="wo-info"><div class="wo-title">WO-1047: Formwork — 4th Floor</div><div class="wo-meta">Assigned: Team B &middot; Due Apr 22</div></div>
+            <span class="wo-badge wip">In Progress</span>
+          </div>
+          <button class="view-more-btn" onclick="alert('View all work orders — prototype only')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            View All Work Orders
+          </button>
+        </div>
+      </div>
+
+      <!-- Deliveries -->
+      <div class="section" id="sec-del">
+        <div class="section-hdr" onclick="toggle('sec-del')">
+          <div class="sh-left">
+            <div class="sh-icon orange"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div>
+            <div><div class="sh-title">Deliveries</div><div class="sh-sub">2 received, 1 pending</div></div>
+          </div>
+          <div class="sh-right">
+            <span class="sh-badge orange">1 pending</span>
+            <svg class="sh-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+        </div>
+        <div class="section-body">
+          <div class="del-group">Received</div>
+          <div class="del-item"><div class="del-info"><div class="del-name">TMT Steel Bars (12mm)</div><div class="del-meta">PO #2847 &middot; 5 tonnes &middot; 11:45 AM</div></div><span class="del-badge received">Accepted</span></div>
+          <div class="del-item"><div class="del-info"><div class="del-name">Ready Mix Concrete M30</div><div class="del-meta">PO #2851 &middot; 8 cu.m &middot; 9:30 AM</div></div><span class="del-badge received">Accepted</span></div>
+          <div class="del-group">Pending</div>
+          <div class="del-item" style="border:1px solid var(--warning-light);background:var(--warning-lighter);">
+            <div class="del-info"><div class="del-name">Aluminium Window Frames</div><div class="del-meta">PO #2839 &middot; 24 units &middot; Expected by 2 PM</div></div>
+            <span class="del-badge pending">Pending</span>
+          </div>
+          <button class="view-more-btn" onclick="alert('View full delivery history — prototype only')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            View All Deliveries
+          </button>
+        </div>
+      </div>
+
+      <!-- Equipment -->
+      <div class="section" id="sec-equip">
+        <div class="section-hdr" onclick="toggle('sec-equip')">
+          <div class="sh-left">
+            <div class="sh-icon teal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg></div>
+            <div><div class="sh-title">Equipment</div><div class="sh-sub">4 on site &middot; 3 active</div></div>
+          </div>
+          <div class="sh-right">
+            <span class="sh-badge gray">4 units</span>
+            <svg class="sh-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+        </div>
+        <div class="section-body">
+          <div class="eq-item" style="padding-top:14px;">
+            <div class="eq-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div>
+            <div class="eq-info"><div class="eq-name">Tower Crane TC-200</div><div class="eq-meta">Rented &middot; 6.5 hrs &middot; Op: Mohan S.</div></div>
+            <div class="eq-status"><span class="eq-dot active"></span><span style="color:var(--success-base)">Active</span></div>
+          </div>
+          <div class="eq-item">
+            <div class="eq-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M8 12h8M12 8v8"/></svg></div>
+            <div class="eq-info"><div class="eq-name">Concrete Mixer 500L</div><div class="eq-meta">Owned &middot; 4 hrs &middot; Op: Team A</div></div>
+            <div class="eq-status"><span class="eq-dot active"></span><span style="color:var(--success-base)">Active</span></div>
+          </div>
+          <div class="eq-item">
+            <div class="eq-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg></div>
+            <div class="eq-info"><div class="eq-name">Excavator JCB 3DX</div><div class="eq-meta">Rented &middot; 5 hrs &middot; Op: Ganesh R.</div></div>
+            <div class="eq-status"><span class="eq-dot active"></span><span style="color:var(--success-base)">Active</span></div>
+          </div>
+          <div class="eq-item">
+            <div class="eq-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+            <div class="eq-info"><div class="eq-name">Bar Bending Machine</div><div class="eq-meta">Owned &middot; 0 hrs &middot; Maintenance</div></div>
+            <div class="eq-status"><span class="eq-dot idle"></span><span style="color:var(--text-soft)">Idle</span></div>
+          </div>
+          <button class="view-more-btn" onclick="alert('View full equipment list — prototype only')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            View All Equipment
+          </button>
+        </div>
+      </div>
+
+      <!-- Incidents & Safety -->
+      <div class="section" id="sec-inc">
+        <div class="section-hdr" onclick="toggle('sec-inc')">
+          <div class="sh-left">
+            <div class="sh-icon red"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+            <div><div class="sh-title">Incidents & Safety</div><div class="sh-sub">1 incident reported</div></div>
+          </div>
+          <div class="sh-right">
+            <span class="sh-badge red">1 incident</span>
+            <svg class="sh-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+        </div>
+        <div class="section-body">
+          <div class="safety-check ok">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0B4627" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            <span class="safety-check-text">Daily safety checklist completed at 7:45 AM</span>
+          </div>
+          <div class="incident-card">
+            <div class="inc-hdr"><span class="inc-sev near-miss">Near Miss</span><span class="inc-time">3:15 PM</span></div>
+            <div class="inc-desc">Worker slipped on wet surface near Block B. Minor bruise — no medical attention required.</div>
+            <div class="inc-action">Action: Area cordoned off, anti-slip mats placed. Safety briefing tomorrow.</div>
+          </div>
+          <button class="view-more-btn" onclick="alert('View full incident history — prototype only')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            View Incident History
+          </button>
+        </div>
+      </div>
+
+      <!-- Weather -->
+      <div class="section" id="sec-weather">
+        <div class="section-hdr" onclick="toggle('sec-weather')">
+          <div class="sh-left">
+            <div class="sh-icon sky"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/></svg></div>
+            <div><div class="sh-title">Weather</div><div class="sh-sub">34°C Sunny &middot; No delays</div></div>
+          </div>
+          <div class="sh-right"><svg class="sh-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div>
+        </div>
+        <div class="section-body">
+          <div class="weather-main">
+            <div><div class="w-temp">34°</div></div>
+            <div><div class="w-cond">Sunny, Clear Sky</div><div class="w-loc">Pune, MH &middot; Updated 30m ago</div></div>
+          </div>
+          <div class="w-details">
+            <div class="w-detail"><div class="w-detail-val">45%</div><div class="w-detail-lbl">Humidity</div></div>
+            <div class="w-detail"><div class="w-detail-val">12 km/h</div><div class="w-detail-lbl">Wind</div></div>
+            <div class="w-detail"><div class="w-detail-val">0 mm</div><div class="w-detail-lbl">Rain</div></div>
+          </div>
+          <div class="w-7day">
+            <div class="w-day"><div class="w-day-name">Mon</div><div class="w-day-icon">&#9728;&#65039;</div><div class="w-day-temp">33°</div></div>
+            <div class="w-day"><div class="w-day-name">Tue</div><div class="w-day-icon">&#9728;&#65039;</div><div class="w-day-temp">35°</div></div>
+            <div class="w-day"><div class="w-day-name">Wed</div><div class="w-day-icon">&#9925;</div><div class="w-day-temp">32°</div></div>
+            <div class="w-day"><div class="w-day-name">Thu</div><div class="w-day-icon">&#127782;&#65039;</div><div class="w-day-temp">28°</div></div>
+            <div class="w-day"><div class="w-day-name">Fri</div><div class="w-day-icon">&#9925;</div><div class="w-day-temp">30°</div></div>
+            <div class="w-day"><div class="w-day-name">Sat</div><div class="w-day-icon">&#9728;&#65039;</div><div class="w-day-temp">33°</div></div>
+            <div class="w-day today"><div class="w-day-name">Sun</div><div class="w-day-icon">&#9728;&#65039;</div><div class="w-day-temp">34°</div></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div class="home-ind"><div class="home-ind-bar"></div></div>
+  </div>
+
+  <!-- ===== SCREEN 3: REPORTS ===== -->
+  <div class="screen" id="s-reports">
+    <div class="status-bar on-white">
+      <span class="status-time">9:41</span>
+      <div class="status-icons">
+        <svg viewBox="0 0 18 12"><rect x="0" y="9" width="3" height="3" rx=".5"/><rect x="4.5" y="6" width="3" height="6" rx=".5"/><rect x="9" y="3" width="3" height="9" rx=".5"/><rect x="13.5" y="0" width="3" height="12" rx=".5"/></svg>
+        <svg viewBox="0 0 18 12"><circle cx="9" cy="11" r="1"/><path d="M5.93 7.82a5 5 0 017.14 0" stroke="currentColor" fill="none" stroke-width="1.2" stroke-linecap="round"/><path d="M2.5 5a9 9 0 0113 0" stroke="currentColor" fill="none" stroke-width="1.2" stroke-linecap="round"/></svg>
+        <svg viewBox="0 0 27 13" width="27" height="13"><rect x=".5" y=".5" width="22" height="12" rx="2.5" stroke="currentColor" fill="none" stroke-opacity=".35"/><rect x="2" y="2" width="19" height="9" rx="1.5"/><path d="M24 4.5v4a1.5 1.5 0 000-4z" fill-opacity=".4"/></svg>
+      </div>
+    </div>
+
+    <div class="top-bar">
+      <button class="top-bar-back" onclick="showScreen('home')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <span class="top-bar-title">Reports</span>
+    </div>
+
+    <div class="report-tabs">
+      <div class="r-tab active" onclick="pickTab(this)">Weekly</div>
+      <div class="r-tab" onclick="pickTab(this)">Daily</div>
+      <div class="r-tab" onclick="pickTab(this)">Custom</div>
+    </div>
+
+    <div class="scroll-area">
+      <div class="gen-cta">
+        <div class="gen-cta-title">Generate Weekly Report</div>
+        <div class="gen-cta-desc">Auto-compile data from Apr 14 – Apr 20 for any project</div>
+        <button class="btn-primary-fill" onclick="alert('Report generation — prototype only')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Generate Report
+        </button>
+      </div>
+
+      <!-- Report Preview -->
+      <div class="rpt-preview">
+        <div class="rpt-hdr">
+          <div class="rpt-type">Weekly Report</div>
+          <div class="rpt-title">Skyline Tower - Phase 2</div>
+          <div class="rpt-date">Apr 14 – Apr 20, 2026</div>
+        </div>
+        <div class="rpt-body">
+          <div class="rpt-grid">
+            <div class="rpt-stat"><div class="rpt-stat-lbl">Workers</div><div class="rpt-stat-val">47</div><div class="rpt-stat-chg up">+5% vs last week</div></div>
+            <div class="rpt-stat"><div class="rpt-stat-lbl">Total Hours</div><div class="rpt-stat-val">2,184</div><div class="rpt-stat-chg up">+128 hrs</div></div>
+            <div class="rpt-stat"><div class="rpt-stat-lbl">Tasks Done</div><div class="rpt-stat-val">32</div><div class="rpt-stat-chg up">+8 vs last week</div></div>
+            <div class="rpt-stat"><div class="rpt-stat-lbl">Work Orders</div><div class="rpt-stat-val">12/14</div><div class="rpt-stat-chg up">86% completed</div></div>
+            <div class="rpt-stat"><div class="rpt-stat-lbl">Deliveries</div><div class="rpt-stat-val">14</div><div class="rpt-stat-chg down">2 delayed</div></div>
+            <div class="rpt-stat"><div class="rpt-stat-lbl">Incidents</div><div class="rpt-stat-val">1</div><div class="rpt-stat-chg neutral">Near miss only</div></div>
+          </div>
+
+          <div class="mini-chart-title">Daily Worker Count (7 Days)</div>
+          <div class="chart-bars">
+            <div class="chart-col"><div class="chart-bar" style="height:38px"></div><div class="chart-lbl">M</div></div>
+            <div class="chart-col"><div class="chart-bar" style="height:44px"></div><div class="chart-lbl">T</div></div>
+            <div class="chart-col"><div class="chart-bar" style="height:40px"></div><div class="chart-lbl">W</div></div>
+            <div class="chart-col"><div class="chart-bar" style="height:32px"></div><div class="chart-lbl">T</div></div>
+            <div class="chart-col"><div class="chart-bar" style="height:48px"></div><div class="chart-lbl">F</div></div>
+            <div class="chart-col"><div class="chart-bar" style="height:46px"></div><div class="chart-lbl">S</div></div>
+            <div class="chart-col"><div class="chart-bar" style="height:42px"></div><div class="chart-lbl">S</div></div>
+          </div>
+
+          <div class="rpt-section">
+            <div class="rpt-section-title">Workforce Breakdown</div>
+            <div class="rpt-row"><span class="rpt-row-label">Masons</span><span class="rpt-row-value">12 workers &middot; 548 hrs</span></div>
+            <div class="rpt-row"><span class="rpt-row-label">Laborers</span><span class="rpt-row-value">20 workers &middot; 892 hrs</span></div>
+            <div class="rpt-row"><span class="rpt-row-label">Electricians</span><span class="rpt-row-value">5 workers &middot; 224 hrs</span></div>
+            <div class="rpt-row"><span class="rpt-row-label">Others</span><span class="rpt-row-value">10 workers &middot; 520 hrs</span></div>
+            <div class="rpt-row" style="border-top:1px solid var(--stroke-soft);padding-top:8px;margin-top:4px;"><span class="rpt-row-label">Overtime Total</span><span class="rpt-row-value" style="color:var(--warning-base)">42 hrs</span></div>
+          </div>
+
+          <div class="rpt-section">
+            <div class="rpt-section-title">Equipment Utilization</div>
+            <div class="rpt-row"><span class="rpt-row-label">Tower Crane TC-200</span><span class="rpt-row-value">38 hrs (Rented)</span></div>
+            <div class="rpt-row"><span class="rpt-row-label">Excavator JCB 3DX</span><span class="rpt-row-value">32 hrs (Rented)</span></div>
+            <div class="rpt-row"><span class="rpt-row-label">Concrete Mixer 500L</span><span class="rpt-row-value">28 hrs (Owned)</span></div>
+            <div class="rpt-row"><span class="rpt-row-label">Bar Bending Machine</span><span class="rpt-row-value" style="color:var(--text-soft)">Under maintenance</span></div>
+          </div>
+
+          <div class="rpt-section">
+            <div class="rpt-section-title">Weather Impact</div>
+            <div class="rpt-row"><span class="rpt-row-label">Days affected</span><span class="rpt-row-value">1 (Thu — Rain)</span></div>
+            <div class="rpt-row"><span class="rpt-row-label">Hours lost</span><span class="rpt-row-value" style="color:var(--error-base)">4 hrs</span></div>
+          </div>
+        </div>
+        <div class="rpt-actions">
+          <button class="rpt-btn primary" onclick="alert('View full report — prototype only')">View Full Report</button>
+          <button class="rpt-btn outline">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>PDF
+          </button>
+          <button class="rpt-btn outline">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>Share
+          </button>
+        </div>
+      </div>
+
+      <!-- Report History -->
+      <div class="rpt-history">
+        <div class="rpt-hist-title">Previous Reports</div>
+        <div class="rpt-hist-item">
+          <div class="rpt-hist-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+          <div class="rpt-hist-info"><div class="rpt-hist-name">Skyline Tower — Weekly</div><div class="rpt-hist-meta">Apr 7 – Apr 13, 2026</div></div>
+          <button class="mini-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+        </div>
+        <div class="rpt-hist-item">
+          <div class="rpt-hist-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+          <div class="rpt-hist-info"><div class="rpt-hist-name">Green Valley — Weekly</div><div class="rpt-hist-meta">Apr 7 – Apr 13, 2026</div></div>
+          <button class="mini-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+        </div>
+        <div class="rpt-hist-item">
+          <div class="rpt-hist-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+          <div class="rpt-hist-info"><div class="rpt-hist-name">Metro Hub — Weekly</div><div class="rpt-hist-meta">Apr 7 – Apr 13, 2026</div></div>
+          <button class="mini-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+        </div>
+        <div class="rpt-hist-item">
+          <div class="rpt-hist-icon" style="background:var(--warning-lighter);color:var(--warning-dark)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+          <div class="rpt-hist-info"><div class="rpt-hist-name">Skyline Tower — Daily</div><div class="rpt-hist-meta">Apr 19, 2026</div></div>
+          <button class="mini-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+        </div>
+      </div>
+    </div>
+    <div class="home-ind"><div class="home-ind-bar"></div></div>
+  </div>
+</div>
+
+<script>
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('s-' + id).classList.add('active');
+  }
+  function pickPill(el) {
+    el.parentElement.querySelectorAll('.date-pill').forEach(p => p.classList.remove('active'));
+    el.classList.add('active');
+  }
+  function pickTab(el) {
+    el.parentElement.querySelectorAll('.r-tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+  }
+  function toggle(id) {
+    document.getElementById(id).classList.toggle('collapsed');
+  }
+  function pickChip(el) {
+    el.parentElement.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+  }
+</script>
+</body>
+</html>
