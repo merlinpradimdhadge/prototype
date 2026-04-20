@@ -90,6 +90,27 @@
       z-index: 100;
     }
 
+    /* Mobile: remove phone frame, go full screen */
+    @media (max-width: 430px) {
+      body {
+        background: var(--bg-white);
+        padding: 0;
+        display: block;
+      }
+      .phone-frame {
+        width: 100%;
+        height: 100vh;
+        border-radius: 0;
+        box-shadow: none;
+      }
+      .dynamic-island {
+        display: none;
+      }
+      .status-bar {
+        padding-top: env(safe-area-inset-top, 14px) !important;
+      }
+    }
+
     /* Status bar */
     .status-bar {
       height: 54px;
