@@ -194,6 +194,17 @@ Specs:
 
 Specs: Same border, padding, and error styling as text field. Dropdown menu background: `--color-bg-weak-50`. Selected item uses `--color-text-strong-950`, unselected placeholder uses `--color-text-sub-600`.
 
+### Phone Frame (Desktop Only)
+
+Prototypes use a phone frame wrapper for desktop preview. The following elements are **desktop-only decorations** and must be hidden on real mobile devices using `@media (max-width: 430px)`:
+
+- **Phone frame** (`.phone-frame`) — The device border with rounded corners and shadow. On mobile, remove the frame styling so the prototype goes full-screen.
+- **Dynamic island** (`.dynamic-island`) — The notch/pill at the top of the frame.
+- **Status bar** — The top bar showing time, network, Wi-Fi, and battery icons.
+- **Home indicator** (`.home-ind`) — The bottom swipe bar (`.home-ind-bar`). Real phones have their own native home indicator, so hide this on mobile with `display: none`.
+
+Always include these elements in prototypes for realistic desktop preview, but ensure they are hidden on mobile via media queries so they don't interfere with the actual phone UI.
+
 ### Prototype Rules
 
 - **Always use these component patterns** — do not invent custom button, input, badge, or dropdown styles.

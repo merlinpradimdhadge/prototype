@@ -552,6 +552,9 @@
     /* Home indicator */
     .home-ind { height: 34px; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 8px; flex-shrink: 0; background: var(--bg-white); }
     .home-ind-bar { width: 134px; height: 5px; background: var(--bg-strong); border-radius: 100px; opacity: 0.18; }
+    @media (max-width: 430px) {
+      .home-ind { display: none; }
+    }
 
     @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
     .screen.active .scroll-area, .screen.active .detail-content { animation: fadeUp 0.3s ease-out; }
