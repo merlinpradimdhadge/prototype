@@ -166,14 +166,14 @@
     .top-bar-action:active { background: var(--bg-weak); }
 
     /* Date pills */
-    .filter-bar { padding: 0 20px 12px; background: var(--bg-white); flex-shrink: 0; }
-    .date-pills { display: flex; gap: 8px; margin-bottom: 10px; }
+    .filter-bar { padding: 0 20px 16px; background: var(--bg-white); flex-shrink: 0; }
+    .date-pills { display: flex; gap: 8px; margin-bottom: 12px; }
     .date-pill {
       padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 500;
       border: 1px solid var(--stroke-soft); background: var(--bg-white);
       color: var(--text-sub); cursor: pointer; white-space: nowrap; transition: all 0.15s;
     }
-    .date-pill.active { background: var(--primary-base); color: #fff; border-color: var(--primary-base); }
+    .date-pill.active { background: var(--primary-base); color: #fff; border-color: var(--primary-base); box-shadow: 0 2px 8px rgba(93,47,112,0.25); }
     .date-pill:active { transform: scale(0.97); }
 
     /* Search */
@@ -200,6 +200,17 @@
     .alert-banner-title {
       font-size: 13px; font-weight: 600; color: var(--error-dark);
       margin-bottom: 6px; display: flex; align-items: center; gap: 6px;
+    }
+    .alert-ai-summary {
+      font-size: 12px; color: var(--text-sub); line-height: 17px;
+      padding: 8px 10px; margin-bottom: 8px;
+      background: linear-gradient(135deg, rgba(93,47,112,0.06), rgba(54,90,217,0.06));
+      border-radius: 8px; border-left: 3px solid var(--primary-base);
+    }
+    .alert-ai-summary .ai-label {
+      font-size: 10px; font-weight: 600; color: var(--primary-base);
+      text-transform: uppercase; letter-spacing: 0.5px;
+      display: flex; align-items: center; gap: 4px; margin-bottom: 4px;
     }
     .alert-item { display: flex; align-items: center; gap: 8px; padding: 5px 0; cursor: pointer; }
     .alert-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
@@ -278,6 +289,79 @@
     .d-stat-lbl { font-size: 10px; font-weight: 500; color: var(--brand-200); text-transform: uppercase; letter-spacing: 0.4px; margin-top: 2px; }
     .detail-curve { height: 20px; background: var(--bg-white); margin-top: -20px; border-radius: 20px 20px 0 0; position: relative; z-index: 3; flex-shrink: 0; }
     .detail-content { flex: 1; overflow-y: auto; padding: 0 20px 24px; -webkit-overflow-scrolling: touch; background: var(--bg-white); }
+
+    /* AI Summary Card */
+    .ai-summary-card {
+      margin-bottom: 14px; padding: 16px;
+      background: linear-gradient(135deg, #F6F1FA 0%, #EBF0FF 50%, #F6F1FA 100%);
+      border-radius: 14px; border: 1px solid var(--brand-100);
+      position: relative; overflow: hidden;
+    }
+    .ai-summary-card::before {
+      content: ''; position: absolute; top: -30px; right: -30px;
+      width: 80px; height: 80px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(93,47,112,0.08), transparent);
+    }
+    .ai-summary-header {
+      display: flex; align-items: center; gap: 8px; margin-bottom: 10px;
+    }
+    .ai-summary-icon {
+      width: 30px; height: 30px; border-radius: 8px;
+      background: linear-gradient(135deg, #1F3688, #365AD9);
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .ai-summary-label { font-size: 13px; font-weight: 600; color: var(--text-strong); }
+    .ai-summary-sublabel { font-size: 11px; color: var(--text-sub); }
+    .ai-summary-text { font-size: 13px; color: var(--text-sub); line-height: 19px; position: relative; z-index: 1; }
+    .ai-summary-text strong { color: var(--text-strong); font-weight: 600; }
+
+    /* Weather strip for detail top */
+    .weather-strip {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 14px;
+      padding: 12px 14px; background: var(--bg-weak); border-radius: 12px;
+      border: 1px solid var(--stroke-soft);
+    }
+    .ws-icon { font-size: 28px; line-height: 1; }
+    .ws-temp-main { font-size: 20px; font-weight: 700; color: var(--text-strong); line-height: 1; }
+    .ws-cond-text { font-size: 12px; color: var(--text-sub); margin-top: 2px; }
+    .ws-details-strip { display: flex; gap: 12px; margin-left: auto; }
+    .ws-detail-strip { text-align: center; }
+    .ws-detail-strip-val { font-size: 12px; font-weight: 600; color: var(--text-strong); }
+    .ws-detail-strip-lbl { font-size: 10px; color: var(--text-soft); }
+
+    /* Overall progress bar */
+    .overall-progress {
+      margin-bottom: 14px; padding: 14px 16px;
+      background: var(--bg-white); border-radius: 12px;
+      border: 1px solid var(--stroke-soft);
+    }
+    .op-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+    .op-title { font-size: 13px; font-weight: 600; color: var(--text-strong); }
+    .op-pct { font-size: 18px; font-weight: 700; color: var(--primary-base); }
+    .progress-bar { height: 8px; background: var(--stroke-soft); border-radius: 4px; overflow: hidden; }
+    .progress-fill { height: 100%; border-radius: 4px; transition: width 0.6s ease-out; }
+    .progress-fill.primary { background: linear-gradient(90deg, var(--primary-base), var(--brand-400)); }
+    .progress-fill.success { background: var(--success-base); }
+    .progress-fill.warning { background: var(--warning-base); }
+    .progress-fill.error { background: var(--error-base); }
+    .op-breakdown { display: flex; gap: 6px; margin-top: 10px; }
+    .op-chip {
+      flex: 1; padding: 8px 6px; background: var(--bg-weak); border-radius: 8px; text-align: center;
+    }
+    .op-chip-val { font-size: 14px; font-weight: 700; color: var(--text-strong); }
+    .op-chip-lbl { font-size: 10px; color: var(--text-sub); margin-top: 1px; }
+
+    /* Task progress bar inline */
+    .task-progress-bar { height: 4px; background: var(--stroke-soft); border-radius: 2px; margin-top: 6px; max-width: 120px; }
+    .task-progress-fill { height: 100%; border-radius: 2px; }
+
+    /* Project card mini progress */
+    .pc-progress { margin: 0 0 12px; }
+    .pc-progress-bar { height: 5px; background: var(--stroke-soft); border-radius: 3px; overflow: hidden; }
+    .pc-progress-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--primary-base), var(--brand-400)); }
+    .pc-progress-meta { display: flex; justify-content: space-between; margin-top: 4px; }
+    .pc-progress-lbl { font-size: 11px; color: var(--text-sub); }
+    .pc-progress-pct { font-size: 11px; font-weight: 600; color: var(--primary-base); }
 
     /* Collapsible sections */
     .section { margin-bottom: 8px; border: 1px solid var(--stroke-soft); border-radius: 12px; overflow: hidden; }
@@ -562,6 +646,224 @@
     /* SVG helpers */
     .ico { display: inline-flex; align-items: center; justify-content: center; }
 
+    /* Date range label */
+    .date-range-label {
+      font-size: 12px; color: var(--text-sub); margin-top: 0; margin-bottom: 10px;
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 10px; border-radius: 6px;
+      background: var(--bg-weak); border: 1px solid var(--stroke-soft);
+    }
+    .date-range-label svg { flex-shrink: 0; color: var(--primary-base); }
+
+    /* Trend indicator */
+    .trend-ind {
+      display: inline-flex; align-items: center; gap: 2px;
+      font-size: 10px; font-weight: 600; padding: 1px 5px; border-radius: 4px;
+    }
+    .trend-ind.up { color: var(--success-dark); background: var(--success-lighter); }
+    .trend-ind.down { color: var(--error-dark); background: var(--error-lighter); }
+    .trend-ind.flat { color: var(--text-soft); background: var(--bg-weak); }
+
+    /* Period badge in detail */
+    .period-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 500;
+      background: rgba(255,255,255,0.15); color: var(--brand-200); margin-bottom: 12px;
+    }
+
+    /* Daily breakdown mini chart */
+    .daily-chart { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--stroke-soft); }
+    .daily-chart-title { font-size: 11px; font-weight: 600; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 8px; }
+    .dc-bars { display: flex; align-items: flex-end; gap: 4px; height: 40px; }
+    .dc-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; }
+    .dc-bar { width: 100%; border-radius: 3px 3px 0 0; min-height: 3px; transition: height 0.4s ease-out; }
+    .dc-bar.done { background: var(--success-base); }
+    .dc-bar.wip { background: var(--sky-base); }
+    .dc-bar.blocked { background: var(--error-base); }
+    .dc-lbl { font-size: 9px; color: var(--text-soft); font-weight: 500; }
+    .dc-legend { display: flex; gap: 12px; margin-top: 6px; }
+    .dc-legend-item { display: flex; align-items: center; gap: 4px; font-size: 10px; color: var(--text-sub); }
+    .dc-legend-dot { width: 6px; height: 6px; border-radius: 2px; }
+
+    /* Stat with trend in project card */
+    .pc-stat-trend { font-size: 9px; font-weight: 600; margin-top: 1px; }
+    .pc-stat-trend.up { color: var(--success-base); }
+    .pc-stat-trend.down { color: var(--error-base); }
+
+    /* Aggregate summary strip in detail */
+    .agg-strip {
+      display: flex; gap: 6px; margin-bottom: 14px; padding: 10px 12px;
+      background: var(--bg-weak); border-radius: 10px; border: 1px solid var(--stroke-soft);
+    }
+    .agg-item { flex: 1; text-align: center; }
+    .agg-val { font-size: 14px; font-weight: 700; color: var(--text-strong); }
+    .agg-lbl { font-size: 10px; color: var(--text-sub); margin-top: 1px; }
+    .agg-trend { font-size: 9px; font-weight: 600; margin-top: 1px; }
+    .agg-trend.up { color: var(--success-base); }
+    .agg-trend.down { color: var(--error-base); }
+
+    /* ===== REDESIGNED PROGRESS CARD ===== */
+    .progress-card {
+      margin-bottom: 14px; padding: 16px;
+      background: var(--bg-white); border-radius: 12px;
+      border: 1px solid var(--stroke-soft);
+    }
+    .prog-section { margin-bottom: 14px; }
+    .prog-section:last-child { margin-bottom: 0; }
+    .prog-section-hdr {
+      display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;
+    }
+    .prog-section-title {
+      font-size: 12px; font-weight: 600; color: var(--text-sub);
+      text-transform: uppercase; letter-spacing: 0.3px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .prog-section-title .prog-icon {
+      width: 20px; height: 20px; border-radius: 5px;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .prog-pct { font-size: 18px; font-weight: 700; }
+    .prog-pct.primary { color: var(--primary-base); }
+    .prog-pct.success { color: var(--success-base); }
+    .prog-bar { height: 8px; background: var(--stroke-soft); border-radius: 4px; overflow: hidden; margin-bottom: 8px; }
+    .prog-bar-fill { height: 100%; border-radius: 4px; transition: width 0.6s ease-out; }
+    .prog-bar-fill.primary { background: linear-gradient(90deg, var(--primary-base), var(--brand-400)); }
+    .prog-bar-fill.success { background: var(--success-base); }
+    .prog-breakdown {
+      display: flex; gap: 4px; flex-wrap: wrap;
+    }
+    .prog-chip {
+      display: flex; align-items: center; gap: 4px;
+      padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 500;
+    }
+    .prog-chip.done { background: var(--success-lighter); color: var(--success-dark); }
+    .prog-chip.wip { background: var(--sky-lighter); color: #124B68; }
+    .prog-chip.blocked { background: var(--error-lighter); color: var(--error-dark); }
+    .prog-chip.pending { background: var(--warning-lighter); color: var(--warning-dark); }
+    .prog-chip .chip-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+    }
+    .prog-chip.done .chip-dot { background: var(--success-base); }
+    .prog-chip.wip .chip-dot { background: var(--sky-base); }
+    .prog-chip.blocked .chip-dot { background: var(--error-base); }
+    .prog-chip.pending .chip-dot { background: var(--warning-base); }
+    .prog-total { font-size: 11px; color: var(--text-soft); margin-top: 4px; }
+    .prog-divider { height: 1px; background: var(--stroke-soft); margin: 0 -16px; }
+
+
+    /* ===== WEATHER IMPACT CARD (separate from weather strip) ===== */
+    .weather-impact-card {
+      margin-bottom: 14px; padding: 14px 16px;
+      border-radius: 12px;
+      background: var(--warning-lighter);
+      border: 1px solid rgba(250,115,25,0.18);
+    }
+    .weather-impact-card.severe {
+      background: var(--error-lighter);
+      border-color: rgba(251,55,72,0.18);
+    }
+    .wic-header {
+      display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;
+    }
+    .wic-title {
+      font-size: 13px; font-weight: 600; color: var(--warning-dark);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .weather-impact-card.severe .wic-title { color: var(--error-dark); }
+    .wic-title-icon {
+      width: 26px; height: 26px; border-radius: 7px;
+      background: rgba(250,115,25,0.15);
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+      font-size: 14px;
+    }
+    .weather-impact-card.severe .wic-title-icon { background: rgba(251,55,72,0.15); }
+    .wic-hrs {
+      padding: 3px 10px; border-radius: 6px; font-size: 12px; font-weight: 700;
+      background: rgba(250,115,25,0.15); color: var(--warning-dark);
+    }
+    .weather-impact-card.severe .wic-hrs {
+      background: rgba(251,55,72,0.15); color: var(--error-dark);
+    }
+    .wic-item {
+      display: flex; gap: 10px; padding: 8px 10px;
+      background: rgba(255,255,255,0.6); border-radius: 8px; margin-bottom: 6px;
+    }
+    .wic-item:last-child { margin-bottom: 0; }
+    .wic-item-reason {
+      flex: 1; font-size: 12px; font-weight: 500; color: var(--text-strong); line-height: 17px;
+    }
+    .wic-item-meta { font-size: 11px; color: var(--text-sub); font-weight: 400; margin-top: 2px; }
+    .wic-item-impact {
+      display: inline-flex; align-items: center; gap: 3px;
+      padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 500;
+      background: rgba(250,115,25,0.12); color: var(--warning-dark); margin-top: 4px;
+    }
+    .weather-impact-card.severe .wic-item-impact {
+      background: rgba(251,55,72,0.12); color: var(--error-dark);
+    }
+    .wic-item-hrs {
+      font-size: 12px; font-weight: 600; color: var(--warning-dark);
+      flex-shrink: 0; white-space: nowrap;
+    }
+    .weather-impact-card.severe .wic-item-hrs { color: var(--error-dark); }
+
+    /* ===== DELAY BADGE ON PROJECT CARDS ===== */
+    .pc-delay-strip {
+      display: flex; align-items: center; gap: 6px;
+      margin-bottom: 10px; padding: 6px 10px;
+      border-radius: 8px; font-size: 11px; font-weight: 500;
+    }
+    .pc-delay-strip.has-delay {
+      background: var(--error-lighter); color: var(--error-dark);
+    }
+    .pc-delay-strip.no-delay {
+      background: var(--success-lighter); color: var(--success-dark);
+    }
+    .pc-delay-strip .pc-delay-icon { flex-shrink: 0; }
+    .pc-delay-strip .pc-delay-types {
+      flex: 1; font-weight: 400; opacity: 0.85; font-size: 10px;
+    }
+    .pc-delay-hrs {
+      font-weight: 700; font-size: 12px; flex-shrink: 0;
+    }
+
+    /* ===== CROSS-PROJECT DELAY SUMMARY (Screen 1) ===== */
+    .delay-summary-strip {
+      margin: 14px 20px 10px; padding: 10px 14px;
+      background: var(--bg-white); border-radius: 12px;
+      border: 1px solid var(--stroke-soft);
+    }
+    .dss-header {
+      display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;
+    }
+    .dss-title {
+      font-size: 13px; font-weight: 600; color: var(--text-strong);
+      display: flex; align-items: center; gap: 6px;
+    }
+    .dss-title-icon {
+      width: 24px; height: 24px; border-radius: 6px;
+      background: var(--warning-lighter); color: var(--warning-dark);
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .dss-total {
+      padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 700;
+      background: var(--error-lighter); color: var(--error-dark);
+    }
+    .dss-total.ok {
+      background: var(--success-lighter); color: var(--success-dark);
+    }
+    .dss-breakdown {
+      display: flex; gap: 6px; flex-wrap: wrap;
+    }
+    .dss-chip {
+      display: flex; align-items: center; gap: 4px;
+      padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 500;
+    }
+    .dss-chip.weather { background: var(--warning-lighter); color: var(--warning-dark); }
+    .dss-chip.delivery { background: var(--error-lighter); color: var(--error-dark); }
+    .dss-chip.equipment { background: var(--sky-lighter); color: #124B68; }
+    .dss-chip.other { background: var(--bg-weak); color: var(--text-sub); }
+
     /* ===== FAB & Quick Log ===== */
     .fab-container { position: absolute; bottom: 50px; right: 20px; z-index: 50; }
     .fab-btn {
@@ -683,6 +985,115 @@
     }
     .qf-checkbox-row input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--primary-base); }
     .qf-checkbox-row label { font-size: 13px; color: var(--text-strong); }
+
+    /* ===== Ask AI Button ===== */
+    .btn-ask-ai {
+      height: 34px; padding: 0 14px; border-radius: 32px; border: none;
+      background: linear-gradient(135deg, #1F3688 0%, #365AD9 50%, #5B7FE8 100%);
+      color: #fff; font-family: var(--font-family); font-size: 12px; font-weight: 600;
+      display: flex; align-items: center; gap: 5px; cursor: pointer;
+      box-shadow: 0 3px 12px rgba(31, 54, 136, 0.35), 0 1px 3px rgba(31, 54, 136, 0.2);
+      white-space: nowrap; flex-shrink: 0; margin-right: 4px;
+      transition: transform 0.15s, box-shadow 0.15s;
+      letter-spacing: 0.2px;
+    }
+    .btn-ask-ai:active { transform: scale(0.95); box-shadow: 0 1px 4px rgba(31, 54, 136, 0.2); }
+    .btn-ask-ai svg { flex-shrink: 0; }
+    .btn-ask-ai .ai-sparkle { animation: sparkle 2s ease-in-out infinite; }
+    @keyframes sparkle { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; transform: scale(0.9); } }
+    .btn-ask-ai.on-dark { border: 1px solid rgba(255,255,255,0.25); margin-right: 8px; }
+
+    /* ===== Ask AI Chat Sheet ===== */
+    .ask-ai-sheet {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      background: var(--bg-white); border-radius: 20px 20px 0 0;
+      z-index: 60; transform: translateY(100%); transition: transform 0.3s ease-out;
+      max-height: 78%; display: flex; flex-direction: column;
+      box-shadow: 0 -4px 24px rgba(0,0,0,0.15);
+    }
+    .ask-ai-sheet.open { transform: translateY(0); }
+    .ask-ai-header {
+      display: flex; align-items: center; gap: 10px;
+      padding: 14px 20px 12px; border-bottom: 1px solid var(--stroke-soft); flex-shrink: 0;
+    }
+    .ask-ai-icon {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: linear-gradient(135deg, #1F3688, #365AD9);
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .ask-ai-header-text { flex: 1; }
+    .ask-ai-title { font-size: 15px; font-weight: 600; color: var(--text-strong); }
+    .ask-ai-context { font-size: 12px; color: var(--text-sub); margin-top: 1px; }
+    .ask-ai-close {
+      width: 32px; height: 32px; border-radius: 50%; border: none;
+      background: var(--bg-weak); display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: var(--text-sub); flex-shrink: 0;
+    }
+    .ask-ai-body { flex: 1; overflow-y: auto; padding: 16px 20px; -webkit-overflow-scrolling: touch; }
+    .ask-ai-suggestions { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+    .ask-ai-chip {
+      padding: 8px 14px; border-radius: 20px;
+      background: linear-gradient(135deg, rgba(31,54,136,0.08), rgba(54,90,217,0.08));
+      border: 1px solid rgba(54,90,217,0.15);
+      font-family: var(--font-family); font-size: 12px; color: #1F3688;
+      cursor: pointer; transition: all 0.15s;
+    }
+    .ask-ai-chip:active { background: linear-gradient(135deg, #1F3688, #365AD9); color: #fff; }
+    .ask-ai-placeholder {
+      text-align: center; padding: 24px 16px; color: var(--text-soft); font-size: 13px;
+    }
+    .ask-ai-placeholder svg { margin-bottom: 8px; opacity: 0.4; }
+    .ask-ai-messages { display: flex; flex-direction: column; gap: 12px; }
+    .ask-ai-msg-user {
+      align-self: flex-end; max-width: 80%; padding: 10px 14px;
+      background: linear-gradient(135deg, #1F3688, #365AD9); color: #fff;
+      border-radius: 14px 14px 4px 14px; font-size: 13px; line-height: 18px;
+    }
+    .ask-ai-msg-ai {
+      align-self: flex-start; max-width: 90%; padding: 14px;
+      background: linear-gradient(135deg, #F6F1FA, #EBF0FF, #F6F1FA);
+      border: 1px solid var(--brand-100); border-radius: 4px 14px 14px 14px;
+      font-size: 13px; line-height: 19px; color: var(--text-sub);
+    }
+    .ask-ai-msg-ai strong { color: var(--text-strong); font-weight: 600; }
+    .ask-ai-msg-ai ul { margin: 6px 0 0 16px; padding: 0; }
+    .ask-ai-msg-ai li { margin-bottom: 4px; }
+    .ask-ai-typing {
+      align-self: flex-start; padding: 10px 16px;
+      background: linear-gradient(135deg, #F6F1FA, #EBF0FF);
+      border-radius: 4px 14px 14px 14px; display: none; gap: 4px; align-items: center;
+    }
+    .ask-ai-typing.visible { display: flex; }
+    .ask-ai-typing span {
+      width: 6px; height: 6px; border-radius: 50%; background: #365AD9;
+      animation: aiDot 1.2s infinite ease-in-out;
+    }
+    .ask-ai-typing span:nth-child(2) { animation-delay: 0.2s; }
+    .ask-ai-typing span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes aiDot {
+      0%, 80%, 100% { opacity: 0.3; transform: scale(0.8); }
+      40% { opacity: 1; transform: scale(1); }
+    }
+    .ask-ai-input-bar {
+      display: flex; align-items: center; gap: 8px;
+      padding: 12px 20px 16px; border-top: 1px solid var(--stroke-soft); flex-shrink: 0;
+    }
+    .ask-ai-input {
+      flex: 1; height: 42px; padding: 10px 14px;
+      border: 1px solid var(--stroke-soft); border-radius: 22px;
+      font-family: var(--font-family); font-size: 14px; color: var(--text-strong);
+      background: var(--bg-weak); outline: none;
+    }
+    .ask-ai-input:focus { border-color: #365AD9; background: var(--bg-white); }
+    .ask-ai-input::placeholder { color: var(--text-soft); }
+    .ask-ai-send {
+      width: 42px; height: 42px; border-radius: 50%; border: none;
+      background: linear-gradient(135deg, #1F3688, #365AD9);
+      color: #fff; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; flex-shrink: 0; transition: opacity 0.15s;
+    }
+    .ask-ai-send:disabled { opacity: 0.4; cursor: default; }
+    .ask-ai-send:active:not(:disabled) { transform: scale(0.93); }
   </style>
 </head>
 <body>
@@ -706,6 +1117,10 @@
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
       </button>
       <span class="top-bar-title">Daily Log</span>
+      <button class="btn-ask-ai" onclick="openAskAI('all')">
+        <svg class="ai-sparkle" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        Ask AI
+      </button>
       <button class="top-bar-action" onclick="showScreen('reports')">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
       </button>
@@ -713,10 +1128,14 @@
 
     <div class="filter-bar">
       <div class="date-pills">
-        <div class="date-pill active" onclick="pickPill(this)">Today</div>
-        <div class="date-pill" onclick="pickPill(this)">Last 7 Days</div>
-        <div class="date-pill" onclick="pickPill(this)">This Month</div>
-        <div class="date-pill" onclick="pickPill(this)">Custom</div>
+        <div class="date-pill active" onclick="pickPill(this,'today')">Today</div>
+        <div class="date-pill" onclick="pickPill(this,'7day')">Last 7 Days</div>
+        <div class="date-pill" onclick="pickPill(this,'month')">This Month</div>
+        <div class="date-pill" onclick="pickPill(this,'custom')">Custom</div>
+      </div>
+      <div class="date-range-label" id="date-range-label">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <span id="date-range-text">Sunday, Apr 27, 2026</span>
       </div>
       <div class="search-bar">
         <svg class="s-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -724,121 +1143,18 @@
       </div>
     </div>
 
-    <!-- Alerts -->
-    <div class="alert-banner">
-      <div class="alert-banner-title">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-        3 items need attention
-      </div>
-      <div class="alert-item" onclick="showScreen('detail')">
-        <span class="alert-dot red"></span>
-        <span class="alert-text">1 incident at Skyline Tower</span>
-        <svg class="alert-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
-      </div>
-      <div class="alert-item">
-        <span class="alert-dot orange"></span>
-        <span class="alert-text">2 deliveries delayed at Green Valley</span>
-        <svg class="alert-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
-      </div>
-      <div class="alert-item">
-        <span class="alert-dot orange"></span>
-        <span class="alert-text">Equipment breakdown at Metro Hub</span>
-        <svg class="alert-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
-      </div>
-    </div>
-
-    <!-- Project Cards -->
+    <!-- Project Cards (rendered dynamically) -->
     <div class="scroll-area">
-      <div class="projects-list">
-        <div class="list-header">5 Active Projects</div>
+      <!-- Alerts (rendered dynamically) -->
+      <div class="alert-banner" id="alert-banner">
+        <!-- Injected by renderAlerts() -->
+      </div>
 
-        <div class="project-card" onclick="showScreen('detail')">
-          <div class="pc-header">
-            <div><div class="pc-name">Skyline Tower - Phase 2</div><div class="pc-loc"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Pune, Maharashtra</div></div>
-            <div class="pc-header-right">
-              <span class="pc-incident-badge"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>1 Incident</span>
-              <span class="status-dot red"></span>
-            </div>
-          </div>
-          <div class="pc-stats">
-            <div class="pc-stat"><div class="pc-stat-val">45</div><div class="pc-stat-lbl">Workers</div></div>
-            <div class="pc-stat"><div class="pc-stat-val">324</div><div class="pc-stat-lbl">Hours</div></div>
-            <div class="pc-stat"><div class="pc-stat-val">5/8</div><div class="pc-stat-lbl">Tasks</div></div>
-            <div class="pc-stat"><div class="pc-stat-val">3/4</div><div class="pc-stat-lbl">W.Orders</div></div>
-          </div>
-          <div class="pc-footer">
-            <div class="pc-weather">&#9728;&#65039; 34°C Sunny</div>
-            <span class="pc-updated">25 min ago</span>
-          </div>
-        </div>
+      <!-- Delay Summary (rendered dynamically) -->
+      <div id="delay-summary-container"></div>
 
-        <div class="project-card" onclick="showScreen('detail')">
-          <div class="pc-header">
-            <div><div class="pc-name">Green Valley Residences</div><div class="pc-loc"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Mumbai, Maharashtra</div></div>
-            <div class="pc-header-right"><span class="status-dot yellow"></span></div>
-          </div>
-          <div class="pc-stats">
-            <div class="pc-stat"><div class="pc-stat-val">38</div><div class="pc-stat-lbl">Workers</div></div>
-            <div class="pc-stat"><div class="pc-stat-val">285</div><div class="pc-stat-lbl">Hours</div></div>
-            <div class="pc-stat"><div class="pc-stat-val">7/10</div><div class="pc-stat-lbl">Tasks</div></div>
-            <div class="pc-stat"><div class="pc-stat-val">2/3</div><div class="pc-stat-lbl">W.Orders</div></div>
-          </div>
-          <div class="pc-footer">
-            <div class="pc-weather">&#9925; 31°C Cloudy</div>
-            <span class="pc-updated">1 hr ago</span>
-          </div>
-        </div>
-
-        <div class="project-card" onclick="showScreen('detail')">
-          <div class="pc-header">
-            <div><div class="pc-name">Metro Hub Commercial</div><div class="pc-loc"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Nashik, Maharashtra</div></div>
-            <div class="pc-header-right"><span class="status-dot yellow"></span></div>
-          </div>
-          <div class="pc-stats">
-            <div class="pc-stat"><div class="pc-stat-val">22</div><div class="pc-stat-lbl">Workers</div></div>
-            <div class="pc-stat"><div class="pc-stat-val">168</div><div class="pc-stat-lbl">Hours</div></div>
-            <div class="pc-stat"><div class="pc-stat-val">4/6</div><div class="pc-stat-lbl">Tasks</div></div>
-            <div class="pc-stat"><div class="pc-stat-val">1/2</div><div class="pc-stat-lbl">W.Orders</div></div>
-          </div>
-          <div class="pc-footer">
-            <div class="pc-weather">&#9728;&#65039; 36°C Hot</div>
-            <span class="pc-updated">2 hrs ago</span>
-          </div>
-        </div>
-
-        <div class="project-card" onclick="showScreen('detail')">
-          <div class="pc-header">
-            <div><div class="pc-name">Riverside Villas</div><div class="pc-loc"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Lonavala, Maharashtra</div></div>
-            <div class="pc-header-right"><span class="status-dot green"></span></div>
-          </div>
-          <div class="pc-stats">
-            <div class="pc-stat"><div class="pc-stat-val">18</div><div class="pc-stat-lbl">Workers</div></div>
-            <div class="pc-stat"><div class="pc-stat-val">142</div><div class="pc-stat-lbl">Hours</div></div>
-            <div class="pc-stat"><div class="pc-stat-val">6/7</div><div class="pc-stat-lbl">Tasks</div></div>
-            <div class="pc-stat"><div class="pc-stat-val">2/2</div><div class="pc-stat-lbl">W.Orders</div></div>
-          </div>
-          <div class="pc-footer">
-            <div class="pc-weather">&#127782;&#65039; 28°C Rainy</div>
-            <span class="pc-updated">45 min ago</span>
-          </div>
-        </div>
-
-        <div class="project-card" onclick="showScreen('detail')">
-          <div class="pc-header">
-            <div><div class="pc-name">Horizon Office Park</div><div class="pc-loc"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Hinjewadi, Pune</div></div>
-            <div class="pc-header-right"><span class="status-dot green"></span></div>
-          </div>
-          <div class="pc-stats">
-            <div class="pc-stat"><div class="pc-stat-val">30</div><div class="pc-stat-lbl">Workers</div></div>
-            <div class="pc-stat"><div class="pc-stat-val">234</div><div class="pc-stat-lbl">Hours</div></div>
-            <div class="pc-stat"><div class="pc-stat-val">9/10</div><div class="pc-stat-lbl">Tasks</div></div>
-            <div class="pc-stat"><div class="pc-stat-val">4/4</div><div class="pc-stat-lbl">W.Orders</div></div>
-          </div>
-          <div class="pc-footer">
-            <div class="pc-weather">&#9728;&#65039; 33°C Sunny</div>
-            <span class="pc-updated">10 min ago</span>
-          </div>
-        </div>
+      <div class="projects-list" id="projects-list">
+        <!-- Cards injected by JS -->
       </div>
     </div>
     <div class="home-ind"><div class="home-ind-bar"></div></div>
@@ -859,17 +1175,26 @@
         <button class="d-back" onclick="showScreen('home')">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>Back
         </button>
+        <div style="flex:1"></div>
+        <button class="btn-ask-ai on-dark" onclick="openAskAI('project')">
+          <svg class="ai-sparkle" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          Ask AI
+        </button>
         <button class="d-action" onclick="showScreen('reports')">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
         </button>
       </div>
       <div class="d-info">
-        <div class="d-name">Skyline Tower - Phase 2</div>
-        <div class="d-loc">
+        <div class="d-name" id="d-name">Skyline Tower - Phase 2</div>
+        <div class="d-loc" id="d-loc">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
           Pune, MH &middot; Rajesh K. (Supervisor)
         </div>
-        <div class="d-stats">
+        <div class="period-badge" id="d-period-badge">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Today — Apr 27, 2026
+        </div>
+        <div class="d-stats" id="d-stats">
           <div class="d-stat"><div class="d-stat-val">45</div><div class="d-stat-lbl">Workers</div></div>
           <div class="d-stat"><div class="d-stat-val">324</div><div class="d-stat-lbl">Hours</div></div>
           <div class="d-stat"><div class="d-stat-val">5/8</div><div class="d-stat-lbl">Tasks</div></div>
@@ -880,6 +1205,11 @@
     <div class="detail-curve"></div>
 
     <div class="detail-content">
+
+      <!-- Dynamic top sections (weather, AI, progress) rendered by JS -->
+      <div id="detail-dynamic-top">
+        <!-- Injected by renderDetailTop() -->
+      </div>
 
       <!-- Activity Timeline -->
       <div class="section" id="sec-activity">
@@ -934,9 +1264,9 @@
               <div class="tl-text">Morning briefing done. 45 workers on site today. All areas accessible.</div>
             </div>
           </div>
-          <button class="view-more-btn" onclick="alert('View all 12 activity entries — prototype only')">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-            View More (8 more entries)
+          <button class="view-more-btn" onclick="alert('Opening all activity entries — prototype only')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            See All (8 more entries)
           </button>
         </div>
       </div>
@@ -985,9 +1315,9 @@
             <div class="worker-info"><div class="worker-name">Ganesh Rane</div><div class="worker-trade">Laborer</div></div>
             <div style="text-align:right"><div class="worker-hours">9 hrs</div><div class="worker-ot">+1 OT</div></div>
           </div>
-          <button class="view-more-btn" onclick="alert('View all 45 workers — prototype only')">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-            View More (40 more workers)
+          <button class="view-more-btn" onclick="alert('Opening all workers — prototype only')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            See All (40 more workers)
           </button>
         </div>
       </div>
@@ -1007,27 +1337,43 @@
         <div class="section-body" style="padding-top:12px;">
           <div class="task-item">
             <div class="task-icon done"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
-            <div class="task-info"><div class="task-name">3rd floor slab casting</div><div class="task-sub">Team A &middot; Suresh M.</div></div>
+            <div class="task-info">
+              <div class="task-name">3rd floor slab casting</div>
+              <div class="task-sub">Team A &middot; Suresh M.</div>
+              <div class="task-progress-bar"><div class="task-progress-fill" style="width:100%;background:var(--success-base)"></div></div>
+            </div>
             <span class="task-pct complete">100%</span>
           </div>
           <div class="task-item">
             <div class="task-icon done"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
-            <div class="task-info"><div class="task-name">Electrical conduit — Block A</div><div class="task-sub">Electrical Team &middot; Amit P.</div></div>
+            <div class="task-info">
+              <div class="task-name">Electrical conduit — Block A</div>
+              <div class="task-sub">Electrical Team &middot; Amit P.</div>
+              <div class="task-progress-bar"><div class="task-progress-fill" style="width:100%;background:var(--success-base)"></div></div>
+            </div>
             <span class="task-pct complete">100%</span>
           </div>
           <div class="task-item">
             <div class="task-icon prog"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><circle cx="12" cy="12" r="1"/></svg></div>
-            <div class="task-info"><div class="task-name">Formwork — 4th floor columns</div><div class="task-sub">Team B &middot; Vijay K.</div></div>
+            <div class="task-info">
+              <div class="task-name">Formwork — 4th floor columns</div>
+              <div class="task-sub">Team B &middot; Vijay K.</div>
+              <div class="task-progress-bar"><div class="task-progress-fill" style="width:60%;background:var(--sky-base)"></div></div>
+            </div>
             <span class="task-pct wip">60%</span>
           </div>
           <div class="task-item">
             <div class="task-icon blocked"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
-            <div class="task-info"><div class="task-name">Window frame installation</div><div class="task-sub">Blocked: frames not delivered</div></div>
+            <div class="task-info">
+              <div class="task-name">Window frame installation</div>
+              <div class="task-sub">Blocked: frames not delivered</div>
+              <div class="task-progress-bar"><div class="task-progress-fill" style="width:0%;background:var(--error-base)"></div></div>
+            </div>
             <span class="task-pct blk">0%</span>
           </div>
-          <button class="view-more-btn" onclick="alert('View all 8 tasks — prototype only')">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-            View More (4 more tasks)
+          <button class="view-more-btn" onclick="alert('Opening all tasks — prototype only')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            See All (4 more tasks)
           </button>
         </div>
       </div>
@@ -1061,9 +1407,9 @@
             <div class="wo-info"><div class="wo-title">WO-1047: Formwork — 4th Floor</div><div class="wo-meta">Assigned: Team B &middot; Due Apr 22</div></div>
             <span class="wo-badge wip">In Progress</span>
           </div>
-          <button class="view-more-btn" onclick="alert('View all work orders — prototype only')">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-            View All Work Orders
+          <button class="view-more-btn" onclick="alert('Opening all work orders — prototype only')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            See All Work Orders
           </button>
         </div>
       </div>
@@ -1089,9 +1435,9 @@
             <div class="del-info"><div class="del-name">Aluminium Window Frames</div><div class="del-meta">PO #2839 &middot; 24 units &middot; Expected by 2 PM</div></div>
             <span class="del-badge pending">Pending</span>
           </div>
-          <button class="view-more-btn" onclick="alert('View full delivery history — prototype only')">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-            View All Deliveries
+          <button class="view-more-btn" onclick="alert('Opening all deliveries — prototype only')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            See All Deliveries
           </button>
         </div>
       </div>
@@ -1129,9 +1475,9 @@
             <div class="eq-info"><div class="eq-name">Bar Bending Machine</div><div class="eq-meta">Owned &middot; 0 hrs &middot; Maintenance</div></div>
             <div class="eq-status"><span class="eq-dot idle"></span><span style="color:var(--text-soft)">Idle</span></div>
           </div>
-          <button class="view-more-btn" onclick="alert('View full equipment list — prototype only')">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-            View All Equipment
+          <button class="view-more-btn" onclick="alert('Opening all equipment — prototype only')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            See All Equipment
           </button>
         </div>
       </div>
@@ -1158,32 +1504,23 @@
             <div class="inc-desc">Worker slipped on wet surface near Block B. Minor bruise — no medical attention required.</div>
             <div class="inc-action">Action: Area cordoned off, anti-slip mats placed. Safety briefing tomorrow.</div>
           </div>
-          <button class="view-more-btn" onclick="alert('View full incident history — prototype only')">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-            View Incident History
+          <button class="view-more-btn" onclick="alert('Opening incident history — prototype only')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            See All Incidents
           </button>
         </div>
       </div>
 
-      <!-- Weather -->
+      <!-- Weather Forecast -->
       <div class="section" id="sec-weather">
         <div class="section-hdr" onclick="toggle('sec-weather')">
           <div class="sh-left">
             <div class="sh-icon sky"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/></svg></div>
-            <div><div class="sh-title">Weather</div><div class="sh-sub">34°C Sunny &middot; No delays</div></div>
+            <div><div class="sh-title">7-Day Forecast</div><div class="sh-sub">No weather delays &middot; Rain expected Thu</div></div>
           </div>
           <div class="sh-right"><svg class="sh-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div>
         </div>
-        <div class="section-body">
-          <div class="weather-main">
-            <div><div class="w-temp">34°</div></div>
-            <div><div class="w-cond">Sunny, Clear Sky</div><div class="w-loc">Pune, MH &middot; Updated 30m ago</div></div>
-          </div>
-          <div class="w-details">
-            <div class="w-detail"><div class="w-detail-val">45%</div><div class="w-detail-lbl">Humidity</div></div>
-            <div class="w-detail"><div class="w-detail-val">12 km/h</div><div class="w-detail-lbl">Wind</div></div>
-            <div class="w-detail"><div class="w-detail-val">0 mm</div><div class="w-detail-lbl">Rain</div></div>
-          </div>
+        <div class="section-body" style="padding-top:12px;">
           <div class="w-7day">
             <div class="w-day"><div class="w-day-name">Mon</div><div class="w-day-icon">&#9728;&#65039;</div><div class="w-day-temp">33°</div></div>
             <div class="w-day"><div class="w-day-name">Tue</div><div class="w-day-icon">&#9728;&#65039;</div><div class="w-day-temp">35°</div></div>
@@ -1199,7 +1536,7 @@
     </div>
 
     <!-- FAB Overlay -->
-    <div class="fab-overlay" id="fab-overlay" onclick="closeFab()"></div>
+    <div class="fab-overlay" id="fab-overlay" onclick="closeFab(); closeAskAI();"></div>
 
     <!-- Quick Log FAB -->
     <div class="fab-container" id="fab-container">
@@ -1287,19 +1624,17 @@
             <option>Ganesh Rane — Laborer</option>
           </select>
         </div>
-        <div class="qf-row">
-          <div class="qf-field">
-            <label class="qf-label">Hours Worked <span class="required">*</span></label>
-            <input class="qf-input" type="number" placeholder="8" min="0" max="24" step="0.5">
-          </div>
-          <div class="qf-field">
-            <label class="qf-label">Date</label>
-            <input class="qf-input" type="date" value="2026-04-20">
-          </div>
+        <div class="qf-field">
+          <label class="qf-label">Start Date & Time <span class="required">*</span></label>
+          <input class="qf-input" type="datetime-local" value="2026-04-27T09:00">
         </div>
         <div class="qf-field">
-          <label class="qf-label">Trade/Role</label>
-          <input class="qf-input" type="text" placeholder="Auto-filled from profile" readonly style="background:var(--bg-weak);color:var(--text-sub);">
+          <label class="qf-label">End Date & Time <span class="required">*</span></label>
+          <input class="qf-input" type="datetime-local" value="2026-04-27T18:00">
+        </div>
+        <div class="qf-field">
+          <label class="qf-label">Description</label>
+          <textarea class="qf-textarea" placeholder="Describe work done (e.g., slab casting, rebar tying...)"></textarea>
         </div>
         <div class="qf-checkbox-row">
           <input type="checkbox" id="ot-flag">
@@ -1632,17 +1967,832 @@
     </div>
     <div class="home-ind"><div class="home-ind-bar"></div></div>
   </div>
+
+  <!-- ===== ASK AI SHEET (shared across screens) ===== -->
+  <div class="ask-ai-sheet" id="ask-ai-sheet">
+    <div class="ask-ai-header">
+      <div class="ask-ai-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      </div>
+      <div class="ask-ai-header-text">
+        <div class="ask-ai-title">Ask AI</div>
+        <div class="ask-ai-context" id="ask-ai-context">All Projects</div>
+      </div>
+      <button class="ask-ai-close" onclick="closeAskAI()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="ask-ai-body" id="ask-ai-body">
+      <div class="ask-ai-suggestions" id="ask-ai-suggestions">
+        <!-- chips injected by JS -->
+      </div>
+      <div class="ask-ai-messages" id="ask-ai-messages">
+        <div class="ask-ai-placeholder" id="ask-ai-placeholder">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <div>Ask me anything about your projects</div>
+        </div>
+      </div>
+      <div class="ask-ai-typing" id="ask-ai-typing"><span></span><span></span><span></span></div>
+    </div>
+    <div class="ask-ai-input-bar">
+      <input class="ask-ai-input" id="ask-ai-input" type="text" placeholder="Type your question..." oninput="toggleAiSend()" onkeydown="if(event.key==='Enter')sendAiQuery()">
+      <button class="ask-ai-send" id="ask-ai-send" disabled onclick="sendAiQuery()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      </button>
+    </div>
+  </div>
 </div>
 
 <script>
+  // ========== STATE ==========
+  let currentPeriod = 'today';
+  let currentProject = 'skyline';
+
+  // ========== DATA MODEL ==========
+  const locIcon = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>';
+  const warnIcon = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>';
+
+  const periodLabels = {
+    today: 'Sunday, Apr 27, 2026',
+    '7day': 'Apr 21 – Apr 27, 2026',
+    month: 'Apr 1 – Apr 27, 2026',
+    custom: 'Select date range...'
+  };
+
+  const projects = {
+    skyline: {
+      name: 'Skyline Tower - Phase 2', loc: 'Pune, Maharashtra', locShort: 'Pune, MH',
+      supervisor: 'Rajesh K.', lastLog: '25 min ago',
+      today: {
+        status: 'red', incident: '1 Incident',
+        workers: 45, hours: 324, tasks: [5,8], wo: [3,4],
+        weather: {icon:'☀️', temp:'34°C', cond:'Sunny'},
+        weatherDetail: {condFull:'Sunny, Clear Sky', humidity:'45%', wind:'12 km/h', rain:'0 mm'},
+        updated: '25 min ago',
+        aiTitle: 'AI Daily Summary', aiSub: "Based on today's logged data",
+        aiText: '<strong>3rd floor slab casting completed</strong> and curing is underway. 45 workers logged 324 hrs with 18 hrs overtime. A <strong>near-miss incident</strong> occurred at Block B — anti-slip mats deployed. Window frame delivery (PO #2839) is still pending, blocking installation work.',
+        taskBreakdown: {done:5, wip:2, blocked:1, total:8},
+        woBreakdown: {done:3, wip:1, pending:0, total:4},
+        delays: {
+          totalHrs: 2.5,
+          items: [
+            {type:'delivery', icon:'🚚', reason:'Window Frames — PO #2839 pending', meta:'Expected by 2 PM, not yet arrived', hrs:'~2 hrs', impact:'Window installation blocked', severity:'high'},
+            {type:'equipment', icon:'🔧', reason:'Bar Bending Machine — maintenance', meta:'Under repair since morning', hrs:'0.5 hrs', impact:'Rebar work slowed', severity:'warn'}
+          ]
+        },
+        dailyChart: null
+      },
+      '7day': {
+        status: 'yellow', incident: '2 Incidents',
+        workers: 52, hours: 2184, tasks: [32,38], wo: [12,14],
+        weather: {icon:'⛅', temp:'32°C', cond:'Mixed'},
+        weatherDetail: {condFull:'Mixed — Sunny to Rainy', humidity:'52%', wind:'14 km/h', rain:'18 mm'},
+        updated: 'Apr 21–27',
+        trends: {workers:'+15%', hours:'+128', tasks:'+8', wo:'+3'},
+        aiTitle: 'AI Weekly Summary', aiSub: 'Apr 21 – Apr 27 analysis',
+        aiText: '<strong>32 of 38 tasks completed</strong> this week (84% rate, up from 76% last week). 52 unique workers logged 2,184 hrs across 7 days. <strong>2 incidents</strong> — 1 near-miss (Block B) and 1 minor (scaffolding check). 2 deliveries delayed impacting 4th floor formwork.',
+        taskBreakdown: {done:32, wip:4, blocked:2, total:38},
+        woBreakdown: {done:12, wip:1, pending:1, total:14},
+        delays: {
+          totalHrs: 12,
+          items: [
+            {type:'delivery', icon:'🚚', reason:'2 delivery delays (Steel, Window Frames)', meta:'PO #2839 & #2852 — avg 1.5 days late', hrs:'6 hrs', impact:'4th floor formwork & window install', severity:'high'},
+            {type:'weather', icon:'🌧️', reason:'Rain delay — Thursday', meta:'Heavy afternoon showers', hrs:'4 hrs', impact:'Exterior slab work paused', severity:'warn'},
+            {type:'equipment', icon:'🔧', reason:'Bar Bending Machine downtime', meta:'Maintenance on Mon-Tue', hrs:'2 hrs', impact:'Rebar preparation slowed', severity:'warn'}
+          ]
+        },
+        dailyChart: [
+          {day:'Mon', done:4, wip:2, blocked:0},
+          {day:'Tue', done:5, wip:1, blocked:1},
+          {day:'Wed', done:6, wip:3, blocked:0},
+          {day:'Thu', done:3, wip:2, blocked:1},
+          {day:'Fri', done:5, wip:1, blocked:0},
+          {day:'Sat', done:4, wip:2, blocked:0},
+          {day:'Sun', done:5, wip:2, blocked:1}
+        ]
+      },
+      month: {
+        status: 'yellow', incident: '4 Incidents',
+        workers: 58, hours: 8420, tasks: [112,130], wo: [42,48],
+        weather: {icon:'☀️', temp:'33°C', cond:'Mostly Sunny'},
+        weatherDetail: {condFull:'Mostly Sunny, 4 rain days', humidity:'48%', wind:'11 km/h', rain:'42 mm'},
+        updated: 'Apr 1–27',
+        trends: {workers:'+22%', hours:'+640', tasks:'+18', wo:'+6'},
+        aiTitle: 'AI Monthly Summary', aiSub: 'Apr 1 – Apr 27 analysis',
+        aiText: '<strong>112 of 130 tasks completed</strong> this month (86%). 58 unique workers, 8,420 total hrs. <strong>4 incidents</strong> (2 near-miss, 2 minor). 3rd floor slab completed, 4th floor formwork 60% done.',
+        taskBreakdown: {done:112, wip:12, blocked:6, total:130},
+        woBreakdown: {done:42, wip:4, pending:2, total:48},
+        delays: {
+          totalHrs: 38,
+          items: [
+            {type:'delivery', icon:'🚚', reason:'6 delivery delays across month', meta:'Steel supply chain — primary bottleneck', hrs:'18 hrs', impact:'Structural work on floors 3-4', severity:'high'},
+            {type:'weather', icon:'🌧️', reason:'4 rain delay days', meta:'Apr 5, 11, 17, 24', hrs:'14 hrs', impact:'Exterior work & slab casting', severity:'warn'},
+            {type:'equipment', icon:'🔧', reason:'2 equipment maintenance events', meta:'Bar Bender (3 days), Mixer (1 day)', hrs:'6 hrs', impact:'Rebar & concrete work', severity:'warn'}
+          ]
+        },
+        dailyChart: null
+      }
+    },
+    greenvalley: {
+      name: 'Green Valley Residences', loc: 'Mumbai, Maharashtra', locShort: 'Mumbai, MH',
+      supervisor: 'Deepak S.', lastLog: '1 hr ago',
+      today: {
+        status: 'yellow', incident: null,
+        workers: 38, hours: 285, tasks: [7,10], wo: [2,3],
+        weather: {icon:'⛅', temp:'31°C', cond:'Cloudy'},
+        weatherDetail: {condFull:'Partly Cloudy', humidity:'62%', wind:'8 km/h', rain:'0 mm'},
+        updated: '1 hr ago',
+        aiTitle: 'AI Daily Summary', aiSub: "Based on today's logged data",
+        aiText: '4th floor plastering <strong>75% complete</strong>. 2 steel deliveries overdue — impacting rebar work on east wing. 38 workers on site. Elevator shaft waterproofing on track for completion tomorrow.',
+        taskBreakdown: {done:7, wip:2, blocked:1, total:10},
+        woBreakdown: {done:2, wip:1, pending:0, total:3},
+        delays: {
+          totalHrs: 3,
+          items: [
+            {type:'delivery', icon:'🚚', reason:'2 steel deliveries overdue', meta:'PO #3105 & #3108 — 1 day late', hrs:'3 hrs', impact:'Rebar work on east wing blocked', severity:'high'}
+          ]
+        },
+        dailyChart: null
+      },
+      '7day': {
+        status: 'yellow', incident: null,
+        workers: 44, hours: 1890, tasks: [28,35], wo: [10,12],
+        weather: {icon:'⛅', temp:'30°C', cond:'Cloudy'},
+        weatherDetail: {condFull:'Mostly Cloudy', humidity:'65%', wind:'10 km/h', rain:'8 mm'},
+        updated: 'Apr 21–27',
+        trends: {workers:'+8%', hours:'+95', tasks:'+5', wo:'+2'},
+        aiTitle: 'AI Weekly Summary', aiSub: 'Apr 21 – Apr 27 analysis',
+        aiText: '<strong>28 of 35 tasks completed</strong> (80%). 44 unique workers, 1,890 hrs total. Steel delivery delays persisted — 3 POs overdue impacting rebar and structural work. Plastering on 3rd and 4th floors progressed well.',
+        taskBreakdown: {done:28, wip:5, blocked:2, total:35},
+        woBreakdown: {done:10, wip:1, pending:1, total:12},
+        delays: {
+          totalHrs: 14,
+          items: [
+            {type:'delivery', icon:'🚚', reason:'3 steel POs overdue', meta:'Avg 2 days late — vendor capacity issue', hrs:'10 hrs', impact:'Rebar & structural work on east wing', severity:'high'},
+            {type:'weather', icon:'🌧️', reason:'Light rain — Wednesday', meta:'Afternoon drizzle', hrs:'2 hrs', impact:'Exterior plastering paused', severity:'warn'},
+            {type:'other', icon:'⚠️', reason:'Crane idle — operator sick leave', meta:'Tuesday, half day', hrs:'2 hrs', impact:'Heavy lifting delayed', severity:'warn'}
+          ]
+        },
+        dailyChart: [
+          {day:'Mon', done:3, wip:2, blocked:1},
+          {day:'Tue', done:4, wip:1, blocked:0},
+          {day:'Wed', done:5, wip:2, blocked:1},
+          {day:'Thu', done:4, wip:1, blocked:0},
+          {day:'Fri', done:5, wip:2, blocked:0},
+          {day:'Sat', done:4, wip:1, blocked:0},
+          {day:'Sun', done:3, wip:2, blocked:1}
+        ]
+      },
+      month: {
+        status: 'yellow', incident: '1 Incident',
+        workers: 50, hours: 7200, tasks: [95,115], wo: [36,42],
+        weather: {icon:'⛅', temp:'31°C', cond:'Mixed'},
+        weatherDetail: {condFull:'Mixed conditions', humidity:'58%', wind:'9 km/h', rain:'35 mm'},
+        updated: 'Apr 1–27',
+        trends: {workers:'+18%', hours:'+520', tasks:'+12', wo:'+4'},
+        aiTitle: 'AI Monthly Summary', aiSub: 'Apr 1 – Apr 27 analysis',
+        aiText: '<strong>95 of 115 tasks completed</strong> (83%). Steel supply chain remains the primary blocker with 8 delayed POs this month. Plastering completed on floors 1-3.',
+        taskBreakdown: {done:95, wip:14, blocked:6, total:115},
+        woBreakdown: {done:36, wip:4, pending:2, total:42},
+        delays: {
+          totalHrs: 42,
+          items: [
+            {type:'delivery', icon:'🚚', reason:'8 steel PO delays', meta:'Vendor capacity — escalation raised Apr 18', hrs:'28 hrs', impact:'Structural & rebar across floors 2-4', severity:'high'},
+            {type:'weather', icon:'🌧️', reason:'5 rain delay days', meta:'Apr 3, 8, 14, 21, 25', hrs:'10 hrs', impact:'Exterior work & plastering', severity:'warn'},
+            {type:'equipment', icon:'🔧', reason:'Scaffolding incident — safety pause', meta:'Apr 12, half day safety review', hrs:'4 hrs', impact:'All exterior work paused', severity:'high'}
+          ]
+        },
+        dailyChart: null
+      }
+    },
+    metrohub: {
+      name: 'Metro Hub Commercial', loc: 'Nashik, Maharashtra', locShort: 'Nashik, MH',
+      supervisor: 'Vikram P.', lastLog: '2 hrs ago',
+      today: {
+        status: 'yellow', incident: null,
+        workers: 22, hours: 168, tasks: [4,6], wo: [1,2],
+        weather: {icon:'☀️', temp:'36°C', cond:'Hot'},
+        weatherDetail: {condFull:'Hot & Dry', humidity:'32%', wind:'6 km/h', rain:'0 mm'},
+        updated: '2 hrs ago',
+        aiTitle: 'AI Daily Summary', aiSub: "Based on today's logged data",
+        aiText: 'Excavation work slowed due to <strong>excavator breakdown</strong> — repair expected by tomorrow. Foundation pour for Block C on schedule. Heat advisory: additional water breaks mandated.',
+        taskBreakdown: {done:4, wip:1, blocked:1, total:6},
+        woBreakdown: {done:1, wip:1, pending:0, total:2},
+        delays: {
+          totalHrs: 4,
+          items: [
+            {type:'equipment', icon:'🔧', reason:'Excavator JCB 3DX — breakdown', meta:'Hydraulic line failure, repair ETA tomorrow', hrs:'3 hrs', impact:'Earthwork & excavation halted', severity:'high'},
+            {type:'weather', icon:'🌡️', reason:'Extreme heat — mandatory breaks', meta:'36°C, 2 extra water breaks', hrs:'1 hr', impact:'All outdoor work slowed', severity:'warn'}
+          ]
+        },
+        dailyChart: null
+      },
+      '7day': {
+        status: 'yellow', incident: '1 Incident',
+        workers: 28, hours: 1120, tasks: [20,28], wo: [7,10],
+        weather: {icon:'☀️', temp:'35°C', cond:'Hot'},
+        weatherDetail: {condFull:'Mostly Hot & Dry', humidity:'35%', wind:'8 km/h', rain:'0 mm'},
+        updated: 'Apr 21–27',
+        trends: {workers:'+12%', hours:'+80', tasks:'+4', wo:'+1'},
+        aiTitle: 'AI Weekly Summary', aiSub: 'Apr 21 – Apr 27 analysis',
+        aiText: '<strong>20 of 28 tasks completed</strong> (71%). Excavator breakdown on Friday cost ~8 hrs. Foundation work 65% complete. Heat-related schedule adjustments on 3 days.',
+        taskBreakdown: {done:20, wip:5, blocked:3, total:28},
+        woBreakdown: {done:7, wip:2, pending:1, total:10},
+        delays: {
+          totalHrs: 16,
+          items: [
+            {type:'equipment', icon:'🔧', reason:'Excavator breakdown — Friday-Sunday', meta:'Hydraulic failure, parts on order', hrs:'8 hrs', impact:'Earthwork delayed by ~1 day', severity:'high'},
+            {type:'weather', icon:'🌡️', reason:'Heat advisories — 3 days', meta:'Mon, Wed, Fri (35°C+)', hrs:'6 hrs', impact:'Reduced outdoor work shifts', severity:'warn'},
+            {type:'other', icon:'⚠️', reason:'Dehydration incident — 1 worker', meta:'Friday, hospitalized for observation', hrs:'2 hrs', impact:'Work paused for safety briefing', severity:'high'}
+          ]
+        },
+        dailyChart: [
+          {day:'Mon', done:3, wip:1, blocked:0},
+          {day:'Tue', done:4, wip:2, blocked:0},
+          {day:'Wed', done:3, wip:1, blocked:1},
+          {day:'Thu', done:3, wip:2, blocked:0},
+          {day:'Fri', done:2, wip:1, blocked:2},
+          {day:'Sat', done:3, wip:1, blocked:0},
+          {day:'Sun', done:2, wip:1, blocked:1}
+        ]
+      },
+      month: {
+        status: 'yellow', incident: '2 Incidents',
+        workers: 32, hours: 4480, tasks: [72,95], wo: [28,36],
+        weather: {icon:'☀️', temp:'35°C', cond:'Hot'},
+        weatherDetail: {condFull:'Predominantly Hot', humidity:'34%', wind:'7 km/h', rain:'2 mm'},
+        updated: 'Apr 1–27',
+        trends: {workers:'+20%', hours:'+380', tasks:'+10', wo:'+3'},
+        aiTitle: 'AI Monthly Summary', aiSub: 'Apr 1 – Apr 27 analysis',
+        aiText: '<strong>72 of 95 tasks completed</strong> (76%). Equipment issues caused 2 delays this month. Foundation phase nearing completion. Heat management protocols working well.',
+        taskBreakdown: {done:72, wip:15, blocked:8, total:95},
+        woBreakdown: {done:28, wip:5, pending:3, total:36},
+        delays: {
+          totalHrs: 42,
+          items: [
+            {type:'equipment', icon:'🔧', reason:'2 equipment breakdowns', meta:'Excavator (Apr 25) & Mixer (Apr 10)', hrs:'14 hrs', impact:'Earthwork & concrete pouring', severity:'high'},
+            {type:'weather', icon:'🌡️', reason:'10 heat advisory days', meta:'35°C+ — reduced shifts', hrs:'20 hrs', impact:'All outdoor work limited to 6-hr shifts', severity:'warn'},
+            {type:'delivery', icon:'🚚', reason:'Cement delivery delay', meta:'PO #4201 — 2 days late (Apr 8)', hrs:'4 hrs', impact:'Foundation pour postponed', severity:'warn'},
+            {type:'other', icon:'⚠️', reason:'Safety incidents — 2 events', meta:'Dehydration (Apr 25), tool injury (Apr 14)', hrs:'4 hrs', impact:'Safety stand-downs & reviews', severity:'high'}
+          ]
+        },
+        dailyChart: null
+      }
+    },
+    riverside: {
+      name: 'Riverside Villas', loc: 'Lonavala, Maharashtra', locShort: 'Lonavala, MH',
+      supervisor: 'Anil K.', lastLog: '45 min ago',
+      today: {
+        status: 'green', incident: null,
+        workers: 18, hours: 142, tasks: [6,7], wo: [2,2],
+        weather: {icon:'🌦️', temp:'28°C', cond:'Rainy'},
+        weatherDetail: {condFull:'Light Showers', humidity:'78%', wind:'15 km/h', rain:'12 mm'},
+        updated: '45 min ago',
+        aiTitle: 'AI Daily Summary', aiSub: "Based on today's logged data",
+        aiText: 'Interior finishing work progressing well despite light rain. <strong>6 of 7 tasks on track</strong>. Painting crew completed unit #12. All work orders fulfilled today.',
+        taskBreakdown: {done:6, wip:1, blocked:0, total:7},
+        woBreakdown: {done:2, wip:0, pending:0, total:2},
+        delays: {totalHrs: 0, items: []},
+        dailyChart: null
+      },
+      '7day': {
+        status: 'green', incident: null,
+        workers: 22, hours: 980, tasks: [24,28], wo: [8,8],
+        weather: {icon:'🌦️', temp:'27°C', cond:'Rainy'},
+        weatherDetail: {condFull:'Rainy, 4 wet days', humidity:'75%', wind:'14 km/h', rain:'45 mm'},
+        updated: 'Apr 21–27',
+        trends: {workers:'+10%', hours:'+60', tasks:'+6', wo:'0'},
+        aiTitle: 'AI Weekly Summary', aiSub: 'Apr 21 – Apr 27 analysis',
+        aiText: '<strong>24 of 28 tasks completed</strong> (86%). All work orders fulfilled. Rain slowed exterior work on 2 days but interior finishing on schedule. No incidents.',
+        taskBreakdown: {done:24, wip:4, blocked:0, total:28},
+        woBreakdown: {done:8, wip:0, pending:0, total:8},
+        delays: {
+          totalHrs: 6,
+          items: [
+            {type:'weather', icon:'🌧️', reason:'Rain delays — 2 days', meta:'Wed & Sat, heavy showers', hrs:'6 hrs', impact:'Exterior painting & waterproofing paused', severity:'warn'}
+          ]
+        },
+        dailyChart: [
+          {day:'Mon', done:4, wip:1, blocked:0},
+          {day:'Tue', done:3, wip:1, blocked:0},
+          {day:'Wed', done:4, wip:2, blocked:0},
+          {day:'Thu', done:3, wip:1, blocked:0},
+          {day:'Fri', done:4, wip:1, blocked:0},
+          {day:'Sat', done:3, wip:1, blocked:0},
+          {day:'Sun', done:3, wip:1, blocked:0}
+        ]
+      },
+      month: {
+        status: 'green', incident: null,
+        workers: 24, hours: 3800, tasks: [88,95], wo: [30,30],
+        weather: {icon:'🌦️', temp:'28°C', cond:'Mixed'},
+        weatherDetail: {condFull:'Mixed, frequent showers', humidity:'72%', wind:'12 km/h', rain:'120 mm'},
+        updated: 'Apr 1–27',
+        trends: {workers:'+15%', hours:'+240', tasks:'+10', wo:'0'},
+        aiTitle: 'AI Monthly Summary', aiSub: 'Apr 1 – Apr 27 analysis',
+        aiText: '<strong>88 of 95 tasks completed</strong> (93%). Excellent progress despite heavy rainfall. All work orders on track. Interior finishing on schedule for May handover.',
+        taskBreakdown: {done:88, wip:5, blocked:2, total:95},
+        woBreakdown: {done:30, wip:0, pending:0, total:30},
+        delays: {
+          totalHrs: 18,
+          items: [
+            {type:'weather', icon:'🌧️', reason:'8 rain delay days across month', meta:'Heavy monsoon showers', hrs:'18 hrs', impact:'Exterior work & landscaping', severity:'warn'}
+          ]
+        },
+        dailyChart: null
+      }
+    },
+    horizon: {
+      name: 'Horizon Office Park', loc: 'Hinjewadi, Pune', locShort: 'Hinjewadi, Pune',
+      supervisor: 'Sunil M.', lastLog: '10 min ago',
+      today: {
+        status: 'green', incident: null,
+        workers: 30, hours: 234, tasks: [9,10], wo: [4,4],
+        weather: {icon:'☀️', temp:'33°C', cond:'Sunny'},
+        weatherDetail: {condFull:'Sunny, Light Breeze', humidity:'40%', wind:'10 km/h', rain:'0 mm'},
+        updated: '10 min ago',
+        aiTitle: 'AI Daily Summary', aiSub: "Based on today's logged data",
+        aiText: 'Final phase work running ahead of schedule. <strong>9 of 10 tasks complete</strong>, all work orders fulfilled. MEP installation 95% done. Handover inspection prep underway.',
+        taskBreakdown: {done:9, wip:1, blocked:0, total:10},
+        woBreakdown: {done:4, wip:0, pending:0, total:4},
+        delays: {totalHrs: 0, items: []},
+        dailyChart: null
+      },
+      '7day': {
+        status: 'green', incident: null,
+        workers: 34, hours: 1560, tasks: [38,42], wo: [16,16],
+        weather: {icon:'☀️', temp:'33°C', cond:'Sunny'},
+        weatherDetail: {condFull:'Clear skies all week', humidity:'38%', wind:'9 km/h', rain:'0 mm'},
+        updated: 'Apr 21–27',
+        trends: {workers:'+6%', hours:'+90', tasks:'+10', wo:'+2'},
+        aiTitle: 'AI Weekly Summary', aiSub: 'Apr 21 – Apr 27 analysis',
+        aiText: '<strong>38 of 42 tasks completed</strong> (90%). All 16 work orders completed. Project at 93% overall. MEP and finishing work on track. Zero incidents, zero delays.',
+        taskBreakdown: {done:38, wip:4, blocked:0, total:42},
+        woBreakdown: {done:16, wip:0, pending:0, total:16},
+        delays: {totalHrs: 0, items: []},
+        dailyChart: [
+          {day:'Mon', done:5, wip:1, blocked:0},
+          {day:'Tue', done:6, wip:1, blocked:0},
+          {day:'Wed', done:5, wip:2, blocked:0},
+          {day:'Thu', done:6, wip:0, blocked:0},
+          {day:'Fri', done:5, wip:1, blocked:0},
+          {day:'Sat', done:6, wip:1, blocked:0},
+          {day:'Sun', done:5, wip:1, blocked:0}
+        ]
+      },
+      month: {
+        status: 'green', incident: null,
+        workers: 36, hours: 6200, tasks: [148,155], wo: [58,60],
+        weather: {icon:'☀️', temp:'33°C', cond:'Sunny'},
+        weatherDetail: {condFull:'Mostly clear, 1 rain day', humidity:'42%', wind:'10 km/h', rain:'5 mm'},
+        updated: 'Apr 1–27',
+        trends: {workers:'+12%', hours:'+480', tasks:'+20', wo:'+6'},
+        aiTitle: 'AI Monthly Summary', aiSub: 'Apr 1 – Apr 27 analysis',
+        aiText: '<strong>148 of 155 tasks completed</strong> (95%). Outstanding performance. Project at 93% overall completion with May 10 handover on track. Zero safety incidents this month.',
+        taskBreakdown: {done:148, wip:5, blocked:2, total:155},
+        woBreakdown: {done:58, wip:2, pending:0, total:60},
+        delays: {totalHrs: 2, items: [
+          {type:'weather', icon:'🌧️', reason:'Light rain — Apr 15', meta:'Half day, cleared by noon', hrs:'2 hrs', impact:'Exterior MEP work paused', severity:'warn'}
+        ]},
+        dailyChart: null
+      }
+    }
+  };
+
+  const alertData = {
+    today: {
+      count: 3,
+      aiText: 'Skyline Tower has a near-miss incident in Block B requiring safety review. Green Valley has 2 overdue steel deliveries impacting 4th floor work. Metro Hub\'s excavator breakdown may delay earthwork by 1 day.',
+      items: [
+        {color:'red', text:'1 incident at Skyline Tower', proj:'skyline'},
+        {color:'orange', text:'2 deliveries delayed at Green Valley', proj:'greenvalley'},
+        {color:'orange', text:'Equipment breakdown at Metro Hub', proj:'metrohub'}
+      ]
+    },
+    '7day': {
+      count: 5,
+      aiText: 'Skyline Tower had 2 incidents this week (1 near-miss, 1 minor) — safety protocol review recommended. Green Valley\'s steel supply chain delayed 3 POs impacting structural work. Metro Hub lost ~8 hrs to excavator breakdown Friday. Overall: 3 of 5 projects on track.',
+      items: [
+        {color:'red', text:'2 incidents at Skyline Tower', proj:'skyline'},
+        {color:'orange', text:'3 PO delays at Green Valley', proj:'greenvalley'},
+        {color:'orange', text:'Equipment downtime at Metro Hub', proj:'metrohub'},
+        {color:'orange', text:'Rain delays at Riverside (2 days)', proj:'riverside'},
+        {color:'orange', text:'Heat advisories at Metro Hub (3 days)', proj:'metrohub'}
+      ]
+    },
+    month: {
+      count: 8,
+      aiText: 'This month: Skyline Tower had 4 incidents requiring review. Green Valley\'s steel supply chain caused 8 PO delays — vendor escalation needed. Metro Hub had 2 equipment breakdowns. Riverside and Horizon performing well with zero incidents.',
+      items: [
+        {color:'red', text:'4 incidents at Skyline Tower', proj:'skyline'},
+        {color:'red', text:'8 delivery delays at Green Valley', proj:'greenvalley'},
+        {color:'orange', text:'2 equipment breakdowns at Metro Hub', proj:'metrohub'},
+        {color:'orange', text:'4 rain delay days at Riverside', proj:'riverside'}
+      ]
+    }
+  };
+
+  // ========== RENDER: ALERT BANNER ==========
+  function renderAlerts() {
+    const a = alertData[currentPeriod] || alertData.today;
+    const banner = document.getElementById('alert-banner');
+    const arrow = '<svg class="alert-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>';
+    banner.innerHTML = `
+      <div class="alert-banner-title">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        ${a.count} items need attention
+      </div>
+      <div class="alert-ai-summary">
+        <div class="ai-label">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          AI Insight
+        </div>
+        ${a.aiText}
+      </div>
+      ${a.items.map(i => `<div class="alert-item" onclick="openProject('${i.proj}')"><span class="alert-dot ${i.color}"></span><span class="alert-text">${i.text}</span>${arrow}</div>`).join('')}
+    `;
+  }
+
+  // ========== RENDER: DELAY SUMMARY STRIP ==========
+  function renderDelaySummary() {
+    const container = document.getElementById('delay-summary-container');
+    const keys = Object.keys(projects);
+    let totalHrs = 0;
+    let byType = {weather:0, delivery:0, equipment:0, other:0};
+    let affectedProjects = 0;
+
+    let weatherProjectDetails = [];
+    keys.forEach(key => {
+      const d = projects[key][currentPeriod] || projects[key].today;
+      if (d.delays.totalHrs > 0) {
+        totalHrs += d.delays.totalHrs;
+        affectedProjects++;
+        d.delays.items.forEach(item => {
+          const hrs = parseFloat(item.hrs) || 0;
+          if (item.type === 'weather') {
+            byType.weather += hrs;
+            weatherProjectDetails.push({name: projects[key].name, hrs: item.hrs, reason: item.reason});
+          }
+          else if (item.type === 'delivery') byType.delivery += hrs;
+          else if (item.type === 'equipment') byType.equipment += hrs;
+          else byType.other += hrs;
+        });
+      }
+    });
+
+    if (byType.weather === 0) {
+      container.innerHTML = `
+        <div class="delay-summary-strip">
+          <div class="dss-header">
+            <div class="dss-title">
+              <span class="dss-title-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>
+              Delay Overview
+            </div>
+            <span class="dss-total ok">0 hrs — No Weather Delays</span>
+          </div>
+        </div>`;
+      return;
+    }
+
+    let projectListHtml = weatherProjectDetails.map(p => `
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:5px 10px;background:rgba(255,255,255,0.6);border-radius:6px;margin-top:6px;">
+        <span style="font-size:12px;font-weight:500;color:var(--text-strong);">${p.name}</span>
+        <span style="font-size:11px;font-weight:600;color:var(--warning-dark);">${p.hrs}</span>
+      </div>
+    `).join('');
+
+    container.innerHTML = `
+      <div class="delay-summary-strip" style="background:var(--warning-lighter);border-color:rgba(250,115,25,0.18);">
+        <div class="dss-header">
+          <div class="dss-title" style="color:var(--warning-dark);">
+            <span class="dss-title-icon">🌧️</span>
+            Weather Delay Overview
+          </div>
+          <span class="dss-total" style="background:rgba(250,115,25,0.15);color:var(--warning-dark);">${byType.weather} hrs</span>
+        </div>
+        ${projectListHtml}
+      </div>`;
+  }
+
+  // ========== RENDER: PROJECT CARDS ==========
+  function renderProjectCards() {
+    const list = document.getElementById('projects-list');
+    const keys = Object.keys(projects);
+    const period = currentPeriod;
+    let html = `<div class="list-header">${keys.length} Active Projects</div>`;
+
+    keys.forEach(key => {
+      const p = projects[key];
+      const d = p[period] || p.today;
+      const pct = Math.round(d.tasks[0] / d.tasks[1] * 100);
+      const isHigh = pct >= 80;
+      const fillColor = isHigh ? 'var(--success-base)' : '';
+      const pctColor = isHigh ? 'color:var(--success-base)' : '';
+      const fillStyle = fillColor ? `background:${fillColor}` : '';
+
+      let incidentHtml = '';
+      if (d.incident) {
+        incidentHtml = `<span class="pc-incident-badge">${warnIcon}${d.incident}</span>`;
+      }
+
+      let trendHtml = '';
+      if (d.trends && period !== 'today') {
+        trendHtml = `
+          <div style="display:flex;gap:2px;justify-content:center;flex-wrap:wrap;margin-top:2px;">
+            <span class="trend-ind up" title="vs previous period">↑ ${d.trends.workers} wkrs</span>
+          </div>`;
+      }
+
+      html += `
+        <div class="project-card" onclick="openProject('${key}')">
+          <div class="pc-header">
+            <div><div class="pc-name">${p.name}</div><div class="pc-loc">${locIcon}${p.loc}</div></div>
+            <div class="pc-header-right">
+              ${incidentHtml}
+              <span class="status-dot ${d.status}"></span>
+            </div>
+          </div>
+          <div class="pc-progress">
+            <div class="pc-progress-bar"><div class="pc-progress-fill" style="width:${pct}%;${fillStyle}"></div></div>
+            <div class="pc-progress-meta">
+              <span class="pc-progress-lbl">Tasks: ${d.tasks[0]}/${d.tasks[1]} · WO: ${d.wo[0]}/${d.wo[1]}</span>
+              <span class="pc-progress-pct" style="${pctColor}">${pct}%</span>
+            </div>
+          </div>
+          ${d.delays.totalHrs > 0 ? `
+          <div class="pc-delay-strip has-delay">
+            <span class="pc-delay-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>
+            <span class="pc-delay-hrs">${d.delays.totalHrs} hrs delayed</span>
+            <span class="pc-delay-types">${d.delays.items.map(i => i.icon).join(' ')}</span>
+          </div>` : `
+          <div class="pc-delay-strip no-delay">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            No delays
+          </div>`}
+          <div class="pc-stats">
+            <div class="pc-stat">
+              <div class="pc-stat-val">${d.workers}</div>
+              <div class="pc-stat-lbl">${period === 'today' ? 'Workers' : 'Unique Wkrs'}</div>
+              ${d.trends ? `<div class="pc-stat-trend up">${d.trends.workers}</div>` : ''}
+            </div>
+            <div class="pc-stat">
+              <div class="pc-stat-val">${d.hours >= 1000 ? (d.hours/1000).toFixed(1)+'K' : d.hours}</div>
+              <div class="pc-stat-lbl">${period === 'today' ? 'Hours' : 'Total Hrs'}</div>
+              ${d.trends ? `<div class="pc-stat-trend up">+${d.trends.hours}</div>` : ''}
+            </div>
+            <div class="pc-stat">
+              <div class="pc-stat-val">${d.tasks[0]}/${d.tasks[1]}</div>
+              <div class="pc-stat-lbl">Tasks</div>
+              ${d.trends ? `<div class="pc-stat-trend up">+${d.trends.tasks}</div>` : ''}
+            </div>
+            <div class="pc-stat">
+              <div class="pc-stat-val">${d.wo[0]}/${d.wo[1]}</div>
+              <div class="pc-stat-lbl">W.Orders</div>
+              ${d.trends ? `<div class="pc-stat-trend up">+${d.trends.wo}</div>` : ''}
+            </div>
+          </div>
+          <div class="pc-footer">
+            <div class="pc-weather">${d.weather.icon} ${d.weather.temp} ${d.weather.cond}</div>
+            <span class="pc-updated">${d.updated}</span>
+          </div>
+        </div>`;
+    });
+
+    list.innerHTML = html;
+  }
+
+  // ========== RENDER: DETAIL TOP (weather, AI, progress) ==========
+  function renderDetailTop() {
+    const p = projects[currentProject];
+    const d = p[currentPeriod] || p.today;
+    const tb = d.taskBreakdown;
+    const wb = d.woBreakdown;
+    const taskPct = Math.round(tb.done / tb.total * 100);
+    const woPct = Math.round(wb.done / wb.total * 100);
+    const taskBarClass = taskPct >= 80 ? 'success' : 'primary';
+    const woBarClass = woPct >= 80 ? 'success' : 'primary';
+    const container = document.getElementById('detail-dynamic-top');
+
+    // Weather strip (clean, no impact inside)
+    let weatherHtml = `
+      <div class="weather-strip">
+        <div class="ws-icon">${d.weather.icon}</div>
+        <div>
+          <div class="ws-temp-main">${d.weather.temp}</div>
+          <div class="ws-cond-text">${d.weatherDetail.condFull}</div>
+        </div>
+        <div class="ws-details-strip">
+          <div class="ws-detail-strip"><div class="ws-detail-strip-val">${d.weatherDetail.humidity}</div><div class="ws-detail-strip-lbl">Humidity</div></div>
+          <div class="ws-detail-strip"><div class="ws-detail-strip-val">${d.weatherDetail.wind}</div><div class="ws-detail-strip-lbl">Wind</div></div>
+          <div class="ws-detail-strip"><div class="ws-detail-strip-val">${d.weatherDetail.rain}</div><div class="ws-detail-strip-lbl">Rain</div></div>
+        </div>
+      </div>`;
+
+    // Weather Impact card (separate, shown only when weather delays exist)
+    const weatherDelays = d.delays.items.filter(i => i.type === 'weather');
+    let weatherImpactHtml = '';
+    if (weatherDelays.length > 0) {
+      const totalWeatherHrs = weatherDelays.reduce((s, w) => {
+        const n = parseFloat(w.hrs); return s + (isNaN(n) ? 0 : n);
+      }, 0);
+      const severe = totalWeatherHrs >= 8;
+      weatherImpactHtml = `
+        <div class="weather-impact-card${severe ? ' severe' : ''}">
+          <div class="wic-header">
+            <div class="wic-title">
+              <span class="wic-title-icon">🌧️</span>
+              Weather Impact
+            </div>
+            <span class="wic-hrs">${totalWeatherHrs || weatherDelays[0].hrs} hrs lost</span>
+          </div>
+          ${weatherDelays.map(w => `
+            <div class="wic-item">
+              <div class="wic-item-reason">
+                ${w.reason}
+                <div class="wic-item-meta">${w.meta}</div>
+                <span class="wic-item-impact">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+                  ${w.impact}
+                </span>
+              </div>
+              <div class="wic-item-hrs">${w.hrs}</div>
+            </div>
+          `).join('')}
+        </div>`;
+    }
+
+    // AI Summary
+    let aiHtml = `
+      <div class="ai-summary-card">
+        <div class="ai-summary-header">
+          <div class="ai-summary-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </div>
+          <div>
+            <div class="ai-summary-label">${d.aiTitle}</div>
+            <div class="ai-summary-sublabel">${d.aiSub}</div>
+          </div>
+        </div>
+        <div class="ai-summary-text">${d.aiText}</div>
+      </div>`;
+
+    // Trend strip for non-today periods
+    let trendStripHtml = '';
+    if (d.trends && currentPeriod !== 'today') {
+      trendStripHtml = `
+        <div class="agg-strip">
+          <div class="agg-item">
+            <div class="agg-val">${d.workers}</div>
+            <div class="agg-lbl">Unique Workers</div>
+            <div class="agg-trend up">↑ ${d.trends.workers}</div>
+          </div>
+          <div class="agg-item">
+            <div class="agg-val">${d.hours >= 1000 ? (d.hours/1000).toFixed(1)+'K' : d.hours}</div>
+            <div class="agg-lbl">Total Hours</div>
+            <div class="agg-trend up">+${d.trends.hours} hrs</div>
+          </div>
+          <div class="agg-item">
+            <div class="agg-val">${d.tasks[0]}/${d.tasks[1]}</div>
+            <div class="agg-lbl">Tasks</div>
+            <div class="agg-trend up">+${d.trends.tasks}</div>
+          </div>
+          <div class="agg-item">
+            <div class="agg-val">${d.wo[0]}/${d.wo[1]}</div>
+            <div class="agg-lbl">W.Orders</div>
+            <div class="agg-trend up">+${d.trends.wo}</div>
+          </div>
+        </div>`;
+    }
+
+    // ===== REDESIGNED PROGRESS CARD =====
+    // Task Progress section
+    let taskChipsHtml = '';
+    if (tb.done) taskChipsHtml += `<span class="prog-chip done"><span class="chip-dot"></span>${tb.done} Completed</span>`;
+    if (tb.wip) taskChipsHtml += `<span class="prog-chip wip"><span class="chip-dot"></span>${tb.wip} In Progress</span>`;
+    if (tb.blocked) taskChipsHtml += `<span class="prog-chip blocked"><span class="chip-dot"></span>${tb.blocked} Blocked</span>`;
+
+    // WO Progress section
+    let woChipsHtml = '';
+    if (wb.done) woChipsHtml += `<span class="prog-chip done"><span class="chip-dot"></span>${wb.done} Completed</span>`;
+    if (wb.wip) woChipsHtml += `<span class="prog-chip wip"><span class="chip-dot"></span>${wb.wip} In Progress</span>`;
+    if (wb.pending) woChipsHtml += `<span class="prog-chip pending"><span class="chip-dot"></span>${wb.pending} Pending</span>`;
+
+    // Daily chart for 7-day view
+    let chartHtml = '';
+    if (d.dailyChart && currentPeriod === '7day') {
+      const maxTasks = Math.max(...d.dailyChart.map(dc => dc.done + dc.wip + dc.blocked));
+      chartHtml = `
+        <div class="daily-chart">
+          <div class="daily-chart-title">Daily Task Breakdown</div>
+          <div class="dc-bars">
+            ${d.dailyChart.map(dc => {
+              const scale = 36 / maxTasks;
+              return `<div class="dc-col">
+                <div style="display:flex;flex-direction:column;gap:1px;align-items:center;width:100%;">
+                  ${dc.blocked ? `<div class="dc-bar blocked" style="height:${Math.max(dc.blocked * scale, 2)}px"></div>` : ''}
+                  ${dc.wip ? `<div class="dc-bar wip" style="height:${Math.max(dc.wip * scale, 2)}px"></div>` : ''}
+                  <div class="dc-bar done" style="height:${Math.max(dc.done * scale, 3)}px"></div>
+                </div>
+                <div class="dc-lbl">${dc.day.charAt(0)}</div>
+              </div>`;
+            }).join('')}
+          </div>
+          <div class="dc-legend">
+            <div class="dc-legend-item"><div class="dc-legend-dot" style="background:var(--success-base)"></div>Done</div>
+            <div class="dc-legend-item"><div class="dc-legend-dot" style="background:var(--sky-base)"></div>In Progress</div>
+            <div class="dc-legend-item"><div class="dc-legend-dot" style="background:var(--error-base)"></div>Blocked</div>
+          </div>
+        </div>`;
+    }
+
+    let progressHtml = `
+      <div class="progress-card">
+        <!-- TASK PROGRESS -->
+        <div class="prog-section">
+          <div class="prog-section-hdr">
+            <div class="prog-section-title">
+              <span class="prog-icon" style="background:var(--info-lighter);color:var(--primary-base)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></span>
+              Task Progress
+            </div>
+            <span class="prog-pct ${taskBarClass}">${taskPct}%</span>
+          </div>
+          <div class="prog-bar"><div class="prog-bar-fill ${taskBarClass}" style="width:${taskPct}%"></div></div>
+          <div class="prog-breakdown">${taskChipsHtml}</div>
+          <div class="prog-total">${tb.done} of ${tb.total} tasks active in this period</div>
+        </div>
+        <div class="prog-divider"></div>
+        <!-- WORK ORDER PROGRESS -->
+        <div class="prog-section" style="margin-top:14px;">
+          <div class="prog-section-hdr">
+            <div class="prog-section-title">
+              <span class="prog-icon" style="background:var(--teal-50);color:#0B463E"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg></span>
+              Work Orders
+            </div>
+            <span class="prog-pct ${woBarClass}">${woPct}%</span>
+          </div>
+          <div class="prog-bar"><div class="prog-bar-fill ${woBarClass}" style="width:${woPct}%"></div></div>
+          <div class="prog-breakdown">${woChipsHtml}</div>
+          <div class="prog-total">${wb.done} of ${wb.total} work orders in this period</div>
+        </div>
+        ${chartHtml}
+      </div>`;
+
+    container.innerHTML = weatherHtml + weatherImpactHtml + aiHtml + (currentPeriod !== 'today' ? trendStripHtml : '') + progressHtml;
+  }
+
+  // ========== RENDER: DETAIL HEADER ==========
+  function renderDetailHeader() {
+    const p = projects[currentProject];
+    const d = p[currentPeriod] || p.today;
+    document.getElementById('d-name').textContent = p.name;
+
+    const periodText = {
+      today: 'Today — Apr 27, 2026',
+      '7day': 'Last 7 Days — Apr 21–27',
+      month: 'This Month — Apr 1–27',
+      custom: 'Custom Range'
+    };
+    document.getElementById('d-period-badge').innerHTML = `
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      ${periodText[currentPeriod]}
+    `;
+
+    document.getElementById('d-loc').innerHTML = `
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      ${p.locShort} · ${p.supervisor} (Supervisor)
+    `;
+
+    document.getElementById('d-stats').innerHTML = `
+      <div class="d-stat"><div class="d-stat-val">${d.workers}</div><div class="d-stat-lbl">${currentPeriod === 'today' ? 'Workers' : 'Unique Wkrs'}</div></div>
+      <div class="d-stat"><div class="d-stat-val">${d.hours >= 1000 ? (d.hours/1000).toFixed(1)+'K' : d.hours}</div><div class="d-stat-lbl">${currentPeriod === 'today' ? 'Hours' : 'Total Hrs'}</div></div>
+      <div class="d-stat"><div class="d-stat-val">${d.tasks[0]}/${d.tasks[1]}</div><div class="d-stat-lbl">Tasks</div></div>
+      <div class="d-stat"><div class="d-stat-val">${d.wo[0]}/${d.wo[1]}</div><div class="d-stat-lbl">W.Orders</div></div>
+    `;
+  }
+
+  // ========== NAVIGATION ==========
   function showScreen(id) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById('s-' + id).classList.add('active');
   }
-  function pickPill(el) {
+
+  function openProject(key) {
+    currentProject = key;
+    renderDetailHeader();
+    renderDetailTop();
+    showScreen('detail');
+  }
+
+  function pickPill(el, period) {
     el.parentElement.querySelectorAll('.date-pill').forEach(p => p.classList.remove('active'));
     el.classList.add('active');
+    currentPeriod = period;
+    document.getElementById('date-range-text').textContent = periodLabels[period];
+    renderAlerts();
+    renderDelaySummary();
+    renderProjectCards();
   }
+
   function pickTab(el) {
     el.parentElement.querySelectorAll('.r-tab').forEach(t => t.classList.remove('active'));
     el.classList.add('active');
@@ -1657,13 +2807,9 @@
 
   // FAB
   function toggleFab() {
-    const btn = document.getElementById('fab-btn');
-    const menu = document.getElementById('fab-menu');
-    const overlay = document.getElementById('fab-overlay');
-    const isOpen = btn.classList.contains('open');
-    btn.classList.toggle('open');
-    menu.classList.toggle('open');
-    overlay.classList.toggle('open');
+    document.getElementById('fab-btn').classList.toggle('open');
+    document.getElementById('fab-menu').classList.toggle('open');
+    document.getElementById('fab-overlay').classList.toggle('open');
   }
   function closeFab() {
     document.getElementById('fab-btn').classList.remove('open');
@@ -1681,8 +2827,146 @@
   }
   function submitQuickForm(type) {
     closeQuickForm(type);
-    alert('Saved! Entry added to today\'s log. (Prototype only)');
+    alert('Saved! Entry added to the log. (Prototype only)');
   }
+
+  // ========== ASK AI ==========
+  let aiMode = 'all'; // 'all' or 'project'
+  const aiSuggestionsAll = [
+    'Projects with delays',
+    'Missed deliveries',
+    'Workforce summary',
+    'Safety overview',
+    'Behind schedule projects',
+    'Today\'s highlights'
+  ];
+  const aiSuggestionsProject = [
+    'Summarize today',
+    'Blocked tasks',
+    'Worker overtime',
+    'Pending deliveries',
+    'Equipment status',
+    'Generate report'
+  ];
+
+  const aiResponses = {
+    summary: `<strong>Today's Summary</strong><ul><li><strong>45 workers</strong> logged across 3 active zones</li><li><strong>324 total hours</strong> (18 hrs overtime)</li><li><strong>5 of 8 tasks</strong> completed (62.5%)</li><li><strong>3 deliveries</strong> received, 1 pending</li><li><strong>1 near-miss incident</strong> reported at Zone C — scaffolding issue, resolved</li></ul>Overall progress is on track. Foundation work in Zone A is ahead of schedule.`,
+    delay: `<strong>Delayed Items</strong><ul><li><strong>Greenfield Mall</strong> — Concrete delivery delayed by 2 hours (supplier issue)</li><li><strong>Metro Bridge Ph-1</strong> — Steel rebar inspection pending, blocking reinforcement work</li><li><strong>Skyline Tower</strong> — Electrical conduit install pushed to tomorrow due to weather</li></ul>2 of 3 delays are expected to resolve by tomorrow.`,
+    worker: `<strong>Workforce Summary</strong><ul><li><strong>Total workers today:</strong> 127 across all sites</li><li><strong>Skyline Tower:</strong> 45 workers, 324 hrs (18 OT)</li><li><strong>Greenfield Mall:</strong> 52 workers, 390 hrs (12 OT)</li><li><strong>Metro Bridge:</strong> 30 workers, 210 hrs (6 OT)</li></ul>Overtime is 4% above budget target this week.`,
+    incident: `<strong>Safety Overview</strong><ul><li><strong>Total incidents today:</strong> 1 near-miss</li><li><strong>Location:</strong> Skyline Tower — Zone C scaffolding</li><li><strong>Status:</strong> Resolved. Area secured, workers briefed</li><li><strong>Safety inspections:</strong> All 5 projects passed daily check</li></ul>Zero lost-time injuries this week.`,
+    delivery: `<strong>Delivery Status</strong><ul><li><strong>Received:</strong> TMT Steel Bars (10 tons) — 8:15 AM</li><li><strong>Received:</strong> Ready-Mix Concrete (3 loads) — 10:30 AM</li><li><strong>Received:</strong> Electrical Conduits — 11:45 AM</li><li><strong>Pending:</strong> Plumbing fixtures — ETA 3:00 PM</li></ul>1 delivery at Greenfield was 2 hours late today.`,
+    equipment: `<strong>Equipment Status</strong><ul><li><strong>Tower Crane #1:</strong> Active — 7.5 hrs today</li><li><strong>Backhoe Loader:</strong> Active — 6 hrs</li><li><strong>Concrete Mixer:</strong> Idle since 11:30 AM</li><li><strong>Generator Set:</strong> Active — backup power for Zone B</li></ul>Overall utilization: 78%. Concrete mixer was idle due to delayed pour schedule.`,
+    report: `<strong>Report Preview</strong><br>A weekly report for <strong>Apr 21–27, 2026</strong> has been prepared covering:<ul><li>Workforce: 127 workers, 924 total hours</li><li>Tasks: 18 of 24 completed (75%)</li><li>Deliveries: 12 received, 2 delayed</li><li>Safety: 1 near-miss, 0 lost-time incidents</li><li>Weather: 1 delay (30 min) due to rain</li></ul>Ready to export as PDF or share via email.`,
+    blocked: `<strong>Blocked Tasks</strong><ul><li><strong>Rebar Reinforcement</strong> (Metro Bridge) — Blocked by pending steel inspection. Inspector scheduled for tomorrow 9 AM.</li><li><strong>Waterproofing</strong> (Skyline Tower) — Waiting for membrane material delivery (ETA: Apr 28)</li><li><strong>HVAC Duct Install</strong> (Greenfield Mall) — Blocked by structural beam alignment. Crew reassigned to Zone D.</li></ul>3 tasks blocked across all projects.`,
+    highlight: `<strong>Today's Highlights</strong><ul><li>Foundation pouring at <strong>Skyline Tower Zone A</strong> completed ahead of schedule</li><li><strong>127 workers</strong> active across all sites — highest this month</li><li>Steel delivery at <strong>Metro Bridge</strong> received early, enabling faster rebar work</li><li>Safety record: <strong>14 consecutive days</strong> without a lost-time incident</li></ul>`
+  };
+
+  function matchAiResponse(query) {
+    const q = query.toLowerCase();
+    if (/summary|summarize|overview|today|highlight/.test(q)) return aiResponses.summary;
+    if (/delay|behind|late|schedule/.test(q)) return aiResponses.delay;
+    if (/worker|workforce|hour|overtime|headcount|staff/.test(q)) return aiResponses.worker;
+    if (/incident|safety|injur|accident/.test(q)) return aiResponses.incident;
+    if (/deliver|shipment|material/.test(q)) return aiResponses.delivery;
+    if (/equipment|idle|crane|machine/.test(q)) return aiResponses.equipment;
+    if (/report|generate|export|pdf/.test(q)) return aiResponses.report;
+    if (/block|stuck|pending/.test(q)) return aiResponses.blocked;
+    return `I can help with <strong>project summaries</strong>, <strong>workforce data</strong>, <strong>deliveries</strong>, <strong>safety incidents</strong>, <strong>equipment status</strong>, and <strong>reports</strong>. Try asking about any of these!`;
+  }
+
+  function openAskAI(mode) {
+    aiMode = mode;
+    const ctx = document.getElementById('ask-ai-context');
+    const suggestions = document.getElementById('ask-ai-suggestions');
+    const msgs = document.getElementById('ask-ai-messages');
+    const placeholder = document.getElementById('ask-ai-placeholder');
+
+    // Set context label
+    if (mode === 'project' && currentProject) {
+      const p = projects[currentProject];
+      ctx.textContent = p ? p.name : 'Project Details';
+    } else {
+      ctx.textContent = 'All Projects';
+    }
+
+    // Render suggestion chips
+    const chips = mode === 'project' ? aiSuggestionsProject : aiSuggestionsAll;
+    suggestions.innerHTML = chips.map(c => `<div class="ask-ai-chip" onclick="askAiSuggestion('${c}')">${c}</div>`).join('');
+
+    // Reset messages
+    msgs.innerHTML = '';
+    placeholder.style.display = 'block';
+    msgs.appendChild(placeholder);
+    document.getElementById('ask-ai-typing').classList.remove('visible');
+    document.getElementById('ask-ai-input').value = '';
+    toggleAiSend();
+
+    // Open
+    document.getElementById('ask-ai-sheet').classList.add('open');
+    document.getElementById('fab-overlay').classList.add('open');
+  }
+
+  function closeAskAI() {
+    document.getElementById('ask-ai-sheet').classList.remove('open');
+    document.getElementById('fab-overlay').classList.remove('open');
+  }
+
+  function toggleAiSend() {
+    const inp = document.getElementById('ask-ai-input');
+    document.getElementById('ask-ai-send').disabled = !inp.value.trim();
+  }
+
+  function askAiSuggestion(text) {
+    document.getElementById('ask-ai-input').value = text;
+    toggleAiSend();
+    sendAiQuery();
+  }
+
+  function sendAiQuery() {
+    const inp = document.getElementById('ask-ai-input');
+    const query = inp.value.trim();
+    if (!query) return;
+
+    const msgs = document.getElementById('ask-ai-messages');
+    const placeholder = document.getElementById('ask-ai-placeholder');
+    const typing = document.getElementById('ask-ai-typing');
+
+    // Hide placeholder
+    placeholder.style.display = 'none';
+
+    // Add user message
+    const userMsg = document.createElement('div');
+    userMsg.className = 'ask-ai-msg-user';
+    userMsg.textContent = query;
+    msgs.appendChild(userMsg);
+
+    // Clear input
+    inp.value = '';
+    toggleAiSend();
+
+    // Show typing
+    typing.classList.add('visible');
+    msgs.appendChild(typing);
+
+    // Scroll to bottom
+    const body = document.getElementById('ask-ai-body');
+    body.scrollTop = body.scrollHeight;
+
+    // Simulate AI response after delay
+    setTimeout(() => {
+      typing.classList.remove('visible');
+      const aiMsg = document.createElement('div');
+      aiMsg.className = 'ask-ai-msg-ai';
+      aiMsg.innerHTML = matchAiResponse(query);
+      msgs.appendChild(aiMsg);
+      body.scrollTop = body.scrollHeight;
+    }, 1500);
+  }
+
+  // ========== INIT ==========
+  renderAlerts();
+  renderDelaySummary();
+  renderProjectCards();
 </script>
 </body>
 </html>
