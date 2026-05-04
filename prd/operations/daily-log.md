@@ -230,7 +230,7 @@ Shows who actually worked on this project and how many hours. No expected/budget
 - **Today's conditions**: Temperature, humidity, wind speed, precipitation, general condition (Sunny/Cloudy/Rainy)
 - **Weather delays**: Any logged delays with hours lost and reason
 - **7-day history**: Mini chart showing temperature + conditions for past week
-- **Forecast**: Next 3-day forecast to help planning
+
 
 ### Section Behavior
 - All sections are **collapsible** — tap section header to expand/collapse
@@ -342,12 +342,6 @@ Each option opens a short, focused form designed for one-hand use.
 - Activities affected (multi-select from today's tasks)
 - Notes
 - Auto-attaches current weather data
-
-### Daily Sign-Off
-At end of day, supervisor reviews all entries and taps "Submit Daily Log". This:
-- Locks the day's entries from further editing
-- Sends push notification to the manager
-- Marks the project's daily log as "Submitted" with timestamp
 
 ---
 
