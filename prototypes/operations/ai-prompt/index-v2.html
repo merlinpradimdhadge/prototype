@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Capture Prompt v2 - MerlinAI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-base: #5D2F70;
+      --bg-soft: #EBEBEB;
+      --bg-weak-50: #F7F7F7;
+      --bg-white: #FFFFFF;
+      --text-strong-950: #171717;
+      --text-sub-600: #5C5C5C;
+      --text-soft-400: #A3A3A3;
+      --text-disabled-300: #D1D1D1;
+      --stroke-sub-300: #D1D1D1;
+      --stroke-soft-200: #EBEBEB;
+      --success-base: #1FC16B;
+      --success-lighter: #E0FAEC;
+      --error-base: #FB3748;
+      --error-lighter: #FFEBEC;
+      --information-lighter: #F6F1FA;
+      --brand-50: #F6F1FA;
+      --brand-100: #E1D3F0;
+      --brand-200: #BC9FD3;
+      --brand-400: #6E3785;
+      --brand-800: #2A1731;
+      --brand-950: #1B101E;
+      --ai-gradient: linear-gradient(135deg, #1F3688 0%, #365AD9 100%);
+      --font-family: 'Inter', sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font-family);
+      color: var(--text-strong-950);
+      background: var(--brand-950);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 40px 20px;
+    }
+
+    .phone-frame {
+      width: 390px;
+      height: 844px;
+      background: var(--bg-white);
+      border-radius: 48px;
+      box-shadow:
+        0 0 0 2px #0D0D0D,
+        0 0 0 7px #2A2A2A,
+        0 0 0 9px #0D0D0D,
+        0 50px 100px rgba(0,0,0,0.5),
+        0 20px 40px rgba(93,47,112,0.15);
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .dynamic-island {
+      position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
+      width: 126px; height: 36px; background: #000; border-radius: 20px; z-index: 100;
+    }
+
+    .status-bar {
+      height: 54px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 28px 0;
+      font-size: 16px; font-weight: 600;
+    }
+    .status-bar .right { display: flex; align-items: center; gap: 6px; }
+
+    .home-ind {
+      position: absolute; bottom: 0; left: 0; right: 0; height: 34px;
+      display: flex; justify-content: center; align-items: flex-end;
+      padding-bottom: 8px; pointer-events: none; z-index: 50;
+    }
+    .home-ind-bar { width: 134px; height: 5px; background: #0D0D0D; border-radius: 100px; }
+
+    .app {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Header */
+    .app-header {
+      flex-shrink: 0;
+      padding: 8px 16px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      min-height: 56px;
+    }
+    .icon-circle-btn {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      background: var(--bg-weak-50);
+      border: 1px solid var(--stroke-soft-200);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      color: var(--text-strong-950);
+      transition: background 0.15s;
+    }
+    .icon-circle-btn:hover { background: var(--bg-soft); }
+    .app-title {
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    /* States */
+    .state {
+      flex: 1;
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+      animation: fadeIn 0.25s ease;
+    }
+    .state.active { display: flex; }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    /* ============================================ */
+    /* MERGED CAPTURE STATE                         */
+    /* ============================================ */
+    .capture {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .capture-top {
+      flex-shrink: 0;
+      padding: 0 20px 16px;
+    }
+    .ai-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      background: var(--information-lighter);
+      border-radius: 100px;
+      color: var(--brand-400);
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+    .ai-pill svg { width: 12px; height: 12px; }
+    .capture-top h1 {
+      font-size: 22px;
+      font-weight: 600;
+      line-height: 1.3;
+      letter-spacing: -0.3px;
+    }
+    .capture-top p {
+      margin-top: 6px;
+      font-size: 13.5px;
+      color: var(--text-sub-600);
+      line-height: 1.5;
+    }
+
+    /* Big input area */
+    .input-area {
+      flex: 1;
+      margin: 0 20px;
+      background: var(--bg-white);
+      border: 1.5px solid var(--stroke-soft-200);
+      border-radius: 18px;
+      display: flex;
+      flex-direction: column;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      position: relative;
+      overflow: hidden;
+      min-height: 0;
+    }
+    .input-area:focus-within {
+      border-color: var(--brand-400);
+      box-shadow: 0 0 0 4px rgba(110, 55, 133, 0.08);
+    }
+    .input-area.recording {
+      border-color: transparent;
+      background: linear-gradient(180deg, #FAFBFF 0%, #F0F3FF 100%);
+      box-shadow: 0 0 0 1.5px rgba(54, 90, 217, 0.3);
+    }
+
+    .prompt-textarea {
+      width: 100%;
+      flex: 1;
+      border: none;
+      outline: none;
+      resize: none;
+      font-family: var(--font-family);
+      font-size: 15.5px;
+      line-height: 1.6;
+      color: var(--text-strong-950);
+      background: transparent;
+      padding: 18px 18px 8px;
+    }
+    .prompt-textarea::placeholder { color: var(--text-soft-400); }
+    .prompt-textarea:disabled {
+      color: var(--text-soft-400);
+      cursor: not-allowed;
+    }
+
+    /* Source tag overlay */
+    .source-tag {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      background: var(--information-lighter);
+      color: var(--brand-400);
+      border-radius: 100px;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.2px;
+      z-index: 2;
+    }
+    .source-tag svg { width: 10px; height: 10px; }
+    .source-tag.hidden { display: none; }
+
+    /* Recording overlay (sits inside the input area) */
+    .rec-overlay {
+      position: absolute;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      padding: 24px;
+      z-index: 3;
+    }
+    .input-area.recording .rec-overlay { display: flex; }
+    .input-area.recording .prompt-textarea,
+    .input-area.recording .input-footer { visibility: hidden; }
+
+    .rec-overlay::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 40%, rgba(54, 90, 217, 0.15) 0%, rgba(54, 90, 217, 0) 60%);
+      animation: breathe 3s ease-in-out infinite;
+      pointer-events: none;
+    }
+    @keyframes breathe {
+      0%, 100% { opacity: 0.7; }
+      50% { opacity: 1; }
+    }
+
+    .rec-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      background: white;
+      border-radius: 100px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--error-base);
+      z-index: 1;
+    }
+    .rec-pill .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--error-base);
+      animation: blink 1.2s ease-in-out infinite;
+    }
+    @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+    .rec-orb {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: var(--ai-gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      box-shadow: 0 16px 40px rgba(31, 54, 136, 0.35);
+      z-index: 1;
+    }
+    .rec-orb::before, .rec-orb::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 2px solid #365AD9;
+      animation: ripple 2s ease-out infinite;
+    }
+    .rec-orb::after { animation-delay: 1s; }
+    @keyframes ripple {
+      0% { transform: scale(1); opacity: 0.6; }
+      100% { transform: scale(1.5); opacity: 0; }
+    }
+    .rec-orb svg { width: 40px; height: 40px; color: white; z-index: 1; }
+
+    .waveform {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      height: 36px;
+      z-index: 1;
+    }
+    .waveform .bar {
+      width: 4px;
+      background: var(--brand-400);
+      border-radius: 4px;
+      animation: wave 1.2s ease-in-out infinite;
+    }
+    .waveform .bar:nth-child(1)  { animation-delay: 0s; }
+    .waveform .bar:nth-child(2)  { animation-delay: 0.1s; }
+    .waveform .bar:nth-child(3)  { animation-delay: 0.2s; }
+    .waveform .bar:nth-child(4)  { animation-delay: 0.3s; }
+    .waveform .bar:nth-child(5)  { animation-delay: 0.4s; }
+    .waveform .bar:nth-child(6)  { animation-delay: 0.5s; }
+    .waveform .bar:nth-child(7)  { animation-delay: 0.4s; }
+    .waveform .bar:nth-child(8)  { animation-delay: 0.3s; }
+    .waveform .bar:nth-child(9)  { animation-delay: 0.2s; }
+    .waveform .bar:nth-child(10) { animation-delay: 0.1s; }
+    .waveform .bar:nth-child(11) { animation-delay: 0s; }
+    .waveform .bar:nth-child(12) { animation-delay: 0.1s; }
+    .waveform .bar:nth-child(13) { animation-delay: 0.2s; }
+    @keyframes wave {
+      0%, 100% { height: 6px; }
+      50% { height: 30px; }
+    }
+
+    .rec-timer {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-strong-950);
+      font-variant-numeric: tabular-nums;
+      z-index: 1;
+    }
+
+    /* Transcribing inline overlay */
+    .trans-overlay {
+      position: absolute;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      padding: 24px;
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(4px);
+      z-index: 4;
+    }
+    .input-area.transcribing .trans-overlay { display: flex; }
+    .trans-spinner {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: 3px solid var(--brand-100);
+      border-top-color: var(--brand-400);
+      animation: spin 0.9s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .trans-overlay .label {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-strong-950);
+    }
+    .trans-overlay .sub {
+      font-size: 12.5px;
+      color: var(--text-sub-600);
+      text-align: center;
+    }
+
+    /* Footer inside input area */
+    .input-footer {
+      flex-shrink: 0;
+      padding: 10px 14px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid var(--stroke-soft-200);
+    }
+    .char-count {
+      font-size: 11px;
+      color: var(--text-soft-400);
+      font-weight: 500;
+    }
+    .clear-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-soft-400);
+      font-family: var(--font-family);
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 6px;
+      transition: all 0.15s;
+    }
+    .clear-btn:hover { color: var(--error-base); background: var(--error-lighter); }
+    .clear-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* Bottom action bar */
+    .bottom-bar {
+      flex-shrink: 0;
+      padding: 14px 20px 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    /* Mic button — round, gradient */
+    .mic-btn {
+      flex-shrink: 0;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      border: none;
+      background: var(--ai-gradient);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(31, 54, 136, 0.32);
+      transition: transform 0.15s, box-shadow 0.2s, background 0.2s;
+      position: relative;
+    }
+    .mic-btn:hover { transform: scale(1.05); }
+    .mic-btn:active { transform: scale(0.96); }
+    .mic-btn svg { width: 22px; height: 22px; }
+
+    /* Mic pulse ring (idle hint) */
+    .mic-btn.idle-hint::before, .mic-btn.idle-hint::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 2px solid #365AD9;
+      opacity: 0;
+      animation: hint-ripple 2.4s ease-out infinite;
+    }
+    .mic-btn.idle-hint::after { animation-delay: 1.2s; }
+    @keyframes hint-ripple {
+      0% { transform: scale(1); opacity: 0.45; }
+      100% { transform: scale(1.4); opacity: 0; }
+    }
+
+    /* Mic in recording state — turns into stop */
+    .mic-btn.is-recording {
+      background: var(--error-base);
+      box-shadow: 0 8px 20px rgba(251, 55, 72, 0.4);
+    }
+    .mic-btn.is-recording svg { display: none; }
+    .mic-btn.is-recording::before {
+      content: '';
+      width: 18px;
+      height: 18px;
+      background: white;
+      border-radius: 4px;
+    }
+
+    .mic-btn:disabled {
+      background: var(--bg-soft);
+      box-shadow: none;
+      color: var(--text-disabled-300);
+      cursor: not-allowed;
+      transform: none;
+    }
+    .mic-btn:disabled::before, .mic-btn:disabled::after { animation: none; opacity: 0; }
+
+    /* Submit button */
+    .submit-btn {
+      flex: 1;
+      height: 56px;
+      border-radius: 100px;
+      border: none;
+      background: var(--text-strong-950);
+      color: white;
+      font-family: var(--font-family);
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: background 0.15s, transform 0.1s;
+    }
+    .submit-btn:hover { background: var(--brand-800); }
+    .submit-btn:active { transform: scale(0.98); }
+    .submit-btn:disabled {
+      background: var(--bg-soft);
+      color: var(--text-disabled-300);
+      cursor: not-allowed;
+    }
+    .submit-btn svg { width: 18px; height: 18px; }
+
+    /* Hint text below input */
+    .input-hint {
+      flex-shrink: 0;
+      padding: 12px 20px 0;
+      font-size: 12px;
+      color: var(--text-soft-400);
+      text-align: center;
+      transition: color 0.2s;
+    }
+    .input-hint b { color: var(--brand-400); font-weight: 600; }
+    .input-hint.warn b { color: var(--error-base); }
+
+    /* ============================================ */
+    /* PROCESSING STATE                             */
+    /* ============================================ */
+    .proc-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      gap: 32px;
+      background:
+        radial-gradient(circle at 20% 30%, rgba(31, 54, 136, 0.06) 0%, transparent 45%),
+        radial-gradient(circle at 80% 70%, rgba(110, 55, 133, 0.06) 0%, transparent 45%),
+        var(--bg-white);
+      position: relative;
+      overflow: hidden;
+    }
+    .proc-orb {
+      position: relative;
+      width: 160px;
+      height: 160px;
+    }
+    .proc-orb .ring {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      border-top-color: #365AD9;
+      animation: spin 1.4s linear infinite;
+    }
+    .proc-orb .ring:nth-child(2) {
+      inset: 12px;
+      border-top-color: var(--brand-400);
+      animation-duration: 2s;
+      animation-direction: reverse;
+    }
+    .proc-orb .ring:nth-child(3) {
+      inset: 24px;
+      border-top-color: #1F3688;
+      animation-duration: 1.8s;
+    }
+    .proc-orb .core {
+      position: absolute;
+      inset: 36px;
+      border-radius: 50%;
+      background: var(--ai-gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: glow 2s ease-in-out infinite;
+    }
+    .proc-orb .core svg { width: 40px; height: 40px; color: white; }
+    @keyframes glow {
+      0%, 100% { box-shadow: 0 0 30px rgba(54, 90, 217, 0.5); }
+      50% { box-shadow: 0 0 60px rgba(54, 90, 217, 0.85); }
+    }
+    .proc-text {
+      text-align: center;
+      max-width: 280px;
+    }
+    .proc-text h2 {
+      font-size: 22px;
+      font-weight: 600;
+      letter-spacing: -0.3px;
+      margin-bottom: 8px;
+    }
+    .proc-text h2 .dots::after {
+      content: '';
+      animation: dots 1.4s steps(4, end) infinite;
+    }
+    @keyframes dots {
+      0%   { content: ''; }
+      25%  { content: '.'; }
+      50%  { content: '..'; }
+      75%  { content: '...'; }
+      100% { content: ''; }
+    }
+    .proc-text p {
+      font-size: 14px;
+      color: var(--text-sub-600);
+      line-height: 1.5;
+    }
+    .proc-prompt-preview {
+      width: 100%;
+      max-width: 320px;
+      padding: 12px 16px;
+      background: var(--bg-weak-50);
+      border: 1px solid var(--stroke-soft-200);
+      border-radius: 12px;
+      font-size: 13px;
+      color: var(--text-sub-600);
+      line-height: 1.5;
+      max-height: 70px;
+      overflow: hidden;
+      position: relative;
+    }
+    .proc-prompt-preview::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 24px;
+      background: linear-gradient(to bottom, transparent, var(--bg-weak-50));
+    }
+    .proc-prompt-preview .pp-label {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-soft-400);
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    /* Mobile: drop the phone frame */
+    @media (max-width: 430px) {
+      body { background: var(--bg-white); padding: 0; display: block; }
+      .phone-frame {
+        width: 100%; height: 100vh;
+        border-radius: 0; box-shadow: none;
+      }
+      .dynamic-island, .status-bar, .home-ind { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="phone-frame">
+    <div class="dynamic-island"></div>
+    <div class="status-bar">
+      <span>9:41</span>
+      <span class="right">
+        <svg width="16" height="11" viewBox="0 0 16 11" fill="currentColor"><path d="M0 8h2v2H0zm4-2h2v4H4zm4-2h2v6H8zm4-2h2v8h-2z"/></svg>
+        <svg width="16" height="11" viewBox="0 0 16 11" fill="currentColor"><path d="M8 2.5C5 2.5 2.4 3.7 0.5 5.5l1 1c1.6-1.5 3.9-2.5 6.5-2.5s4.9 1 6.5 2.5l1-1C13.6 3.7 11 2.5 8 2.5z"/></svg>
+        <svg width="24" height="11" viewBox="0 0 24 11" fill="none">
+          <rect x="1" y="1" width="20" height="9" rx="2" stroke="currentColor" stroke-width="1" opacity="0.4"/>
+          <rect x="3" y="3" width="14" height="5" rx="1" fill="currentColor"/>
+          <rect x="22" y="4" width="1.5" height="3" rx="0.5" fill="currentColor" opacity="0.4"/>
+        </svg>
+      </span>
+    </div>
+
+    <div class="app">
+
+      <div class="app-header">
+        <button class="icon-circle-btn" id="backBtn" aria-label="Back">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+        </button>
+        <div class="app-title" id="appTitle">New Prompt</div>
+        <div style="width:40px"></div>
+      </div>
+
+      <!-- ========== STATE: CAPTURE (merged type + record) ========== -->
+      <div class="state active" data-state="capture">
+        <div class="capture">
+          <div class="capture-top">
+            <span class="ai-pill">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.5 7.5L22 12l-7.5 2.5L12 22l-2.5-7.5L2 12l7.5-2.5z"/></svg>
+              Tell AI what to do
+            </span>
+            <h1>What's on your mind?</h1>
+            <p>Type your request, or tap the mic to speak it.</p>
+          </div>
+
+          <div class="input-area" id="inputArea">
+            <span class="source-tag hidden" id="sourceTag">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/>
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+              </svg>
+              Voice
+            </span>
+
+            <textarea
+              class="prompt-textarea"
+              id="promptInput"
+              placeholder="Type your prompt here, or tap the mic below to speak…"
+            ></textarea>
+
+            <div class="input-footer">
+              <span class="char-count" id="charCount">0 characters</span>
+              <button class="clear-btn" id="clearBtn" disabled>Clear</button>
+            </div>
+
+            <!-- Recording overlay (shown when recording) -->
+            <div class="rec-overlay">
+              <div class="rec-pill"><span class="dot"></span>Recording</div>
+              <div class="rec-orb">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/>
+                  <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                  <line x1="12" y1="19" x2="12" y2="23"/>
+                  <line x1="8" y1="23" x2="16" y2="23"/>
+                </svg>
+              </div>
+              <div class="waveform" aria-hidden="true">
+                <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+                <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+                <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+                <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+                <div class="bar"></div>
+              </div>
+              <div class="rec-timer" id="recTimer">00:00</div>
+            </div>
+
+            <!-- Transcribing overlay -->
+            <div class="trans-overlay">
+              <div class="trans-spinner"></div>
+              <div class="label">Transcribing your audio</div>
+              <div class="sub">Hang tight — converting voice into text.</div>
+            </div>
+          </div>
+
+          <div class="input-hint" id="inputHint">
+            <b>Tip:</b> Tap the mic to speak. Typing is locked while recording.
+          </div>
+
+          <div class="bottom-bar">
+            <button class="mic-btn idle-hint" id="micBtn" aria-label="Start recording">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/>
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                <line x1="12" y1="19" x2="12" y2="23"/>
+                <line x1="8" y1="23" x2="16" y2="23"/>
+              </svg>
+            </button>
+            <button class="submit-btn" id="submitBtn" disabled>
+              Submit
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12"/>
+                <polyline points="12 5 19 12 12 19"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== STATE: PROCESSING ========== -->
+      <div class="state" data-state="processing">
+        <div class="proc-body">
+          <div class="proc-orb">
+            <div class="ring"></div>
+            <div class="ring"></div>
+            <div class="ring"></div>
+            <div class="core">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.5 7.5L22 12l-7.5 2.5L12 22l-2.5-7.5L2 12l7.5-2.5z"/></svg>
+            </div>
+          </div>
+
+          <div class="proc-text">
+            <h2>Processing<span class="dots"></span></h2>
+            <p>AI is working on your request. This usually takes a few seconds.</p>
+          </div>
+
+          <div class="proc-prompt-preview">
+            <div class="pp-label">Your Prompt</div>
+            <div id="procPromptText">—</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="home-ind"><div class="home-ind-bar"></div></div>
+  </div>
+
+  <script>
+    // ===== Element refs =====
+    const states = document.querySelectorAll('.state');
+    const appTitle = document.getElementById('appTitle');
+    const backBtn = document.getElementById('backBtn');
+    const inputArea = document.getElementById('inputArea');
+    const promptInput = document.getElementById('promptInput');
+    const charCount = document.getElementById('charCount');
+    const submitBtn = document.getElementById('submitBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const micBtn = document.getElementById('micBtn');
+    const sourceTag = document.getElementById('sourceTag');
+    const inputHint = document.getElementById('inputHint');
+    const recTimerEl = document.getElementById('recTimer');
+
+    // ===== State =====
+    let mode = 'idle';   // 'idle' | 'recording' | 'transcribing'
+    let screen = 'capture'; // 'capture' | 'processing'
+    let recInterval = null;
+    let recSeconds = 0;
+
+    // ===== Screen switcher =====
+    const titles = { capture: 'New Prompt', processing: 'Processing' };
+    function showScreen(name) {
+      screen = name;
+      states.forEach(s => s.classList.toggle('active', s.dataset.state === name));
+      appTitle.textContent = titles[name];
+      backBtn.style.visibility = (name === 'processing') ? 'hidden' : 'visible';
+    }
+
+    // ===== Char count + submit toggle =====
+    function refreshFooter() {
+      const len = promptInput.value.length;
+      charCount.textContent = `${len} character${len === 1 ? '' : 's'}`;
+      const hasText = promptInput.value.trim().length > 0;
+      submitBtn.disabled = !hasText || mode !== 'idle';
+      clearBtn.disabled = !hasText || mode !== 'idle';
+    }
+    promptInput.addEventListener('input', refreshFooter);
+
+    clearBtn.addEventListener('click', () => {
+      promptInput.value = '';
+      sourceTag.classList.add('hidden');
+      refreshFooter();
+      promptInput.focus();
+    });
+
+    // ===== Hint text by mode =====
+    function refreshHint() {
+      inputHint.classList.remove('warn');
+      if (mode === 'recording') {
+        inputHint.innerHTML = '<b>Listening…</b> typing is locked. Tap the red button to stop.';
+        inputHint.classList.add('warn');
+      } else if (mode === 'transcribing') {
+        inputHint.innerHTML = 'Converting your audio into text…';
+      } else {
+        inputHint.innerHTML = '<b>Tip:</b> Tap the mic to speak. Typing is locked while recording.';
+      }
+    }
+
+    // ===== Recording =====
+    function startRecording() {
+      mode = 'recording';
+      inputArea.classList.add('recording');
+      inputArea.classList.remove('transcribing');
+      micBtn.classList.add('is-recording');
+      micBtn.classList.remove('idle-hint');
+      micBtn.setAttribute('aria-label', 'Stop recording');
+      promptInput.disabled = true;
+      recSeconds = 0;
+      updateTimer();
+      if (recInterval) clearInterval(recInterval);
+      recInterval = setInterval(() => { recSeconds++; updateTimer(); }, 1000);
+      refreshFooter();
+      refreshHint();
+    }
+    function updateTimer() {
+      const m = String(Math.floor(recSeconds / 60)).padStart(2, '0');
+      const s = String(recSeconds % 60).padStart(2, '0');
+      recTimerEl.textContent = `${m}:${s}`;
+    }
+    function stopRecording() {
+      if (recInterval) { clearInterval(recInterval); recInterval = null; }
+      // Switch into transcribing overlay
+      mode = 'transcribing';
+      inputArea.classList.remove('recording');
+      inputArea.classList.add('transcribing');
+      micBtn.classList.remove('is-recording');
+      micBtn.disabled = true;
+      refreshHint();
+
+      setTimeout(() => {
+        // Simulated transcription — append to existing if any
+        const transcribed = "Create a work order for plastering the 4th floor north wing. Assign it to Ravi's team and set the due date to Friday.";
+        const existing = promptInput.value.trim();
+        promptInput.value = existing ? (existing + ' ' + transcribed) : transcribed;
+        sourceTag.classList.remove('hidden');
+
+        inputArea.classList.remove('transcribing');
+        promptInput.disabled = false;
+        micBtn.disabled = false;
+        micBtn.classList.add('idle-hint');
+        micBtn.setAttribute('aria-label', 'Start recording');
+        mode = 'idle';
+        refreshFooter();
+        refreshHint();
+      }, 1600);
+    }
+
+    // ===== Mic button toggles =====
+    micBtn.addEventListener('click', () => {
+      if (mode === 'idle') startRecording();
+      else if (mode === 'recording') stopRecording();
+    });
+
+    // Block typing during recording (defensive — textarea is also disabled)
+    promptInput.addEventListener('keydown', (e) => {
+      if (mode !== 'idle') e.preventDefault();
+    });
+
+    // ===== Submit =====
+    submitBtn.addEventListener('click', () => {
+      if (mode !== 'idle') return;
+      document.getElementById('procPromptText').textContent = promptInput.value.trim();
+      showScreen('processing');
+    });
+
+    // ===== Back =====
+    backBtn.addEventListener('click', () => {
+      if (screen === 'processing') return;
+      if (mode === 'recording') {
+        // cancel recording
+        if (recInterval) { clearInterval(recInterval); recInterval = null; }
+        inputArea.classList.remove('recording');
+        micBtn.classList.remove('is-recording');
+        micBtn.classList.add('idle-hint');
+        promptInput.disabled = false;
+        mode = 'idle';
+        refreshFooter();
+        refreshHint();
+        return;
+      }
+      if (promptInput.value.trim().length > 0) {
+        if (!confirm('Discard your prompt and go back?')) return;
+      }
+      promptInput.value = '';
+      sourceTag.classList.add('hidden');
+      refreshFooter();
+    });
+
+    // Init
+    refreshFooter();
+    refreshHint();
+  </script>
+</body>
+</html>
