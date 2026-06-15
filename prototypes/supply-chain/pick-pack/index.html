@@ -1,0 +1,3038 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pick & Pack - MerlinAI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-dark: #2A1731;
+      --primary-darker: #3B1F46;
+      --primary-base: #5D2F70;
+      --secondary-base: #FDDC8D;
+      --bg-strong: #171717;
+      --bg-surface: #262626;
+      --bg-soft: #EBEBEB;
+      --bg-weak: #F7F7F7;
+      --bg-canvas: #FAFAFB;
+      --bg-white: #FFFFFF;
+      --text-strong: #171717;
+      --text-sub: #5C5C5C;
+      --text-soft: #A3A3A3;
+      --text-disabled: #D1D1D1;
+      --stroke-strong: #171717;
+      --stroke-sub: #D1D1D1;
+      --stroke-soft: #EBEBEB;
+      --success-dark: #0B4627;
+      --success-base: #1FC16B;
+      --success-light: #C2F5DA;
+      --success-lighter: #E0FAEC;
+      --warning-dark: #71330A;
+      --warning-base: #FA7319;
+      --warning-light: #FFD9C0;
+      --warning-lighter: #FFF3EB;
+      --error-dark: #681219;
+      --error-base: #FB3748;
+      --error-light: #FFC0C5;
+      --error-lighter: #FFEBEC;
+      --info-base: #5D2F70;
+      --info-light: #E1D3F0;
+      --info-lighter: #F6F1FA;
+      --sky-base: #47C2FF;
+      --sky-light: #C0EAFF;
+      --sky-lighter: #EBF8FF;
+      --yellow-base: #F6B51E;
+      --yellow-light: #FFECC0;
+      --yellow-lighter: #FFFAEB;
+      --purple-base: #7D52F4;
+      --purple-lighter: #EFEBFF;
+      --pink-base: #FB4BA3;
+      --pink-lighter: #FFEBF4;
+      --teal-base: #22D3BB;
+      --teal-lighter: #E4FBF8;
+      --brand-50: #F6F1FA;
+      --brand-100: #E1D3F0;
+      --brand-200: #BC9FD3;
+      --brand-400: #6E3785;
+      --brand-800: #2A1731;
+      --brand-950: #1B101E;
+      --golden-500: #FDDC8D;
+      --golden-600: #E9B669;
+      --font-family: 'Inter', sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font-family);
+      color: var(--text-strong);
+      background: var(--brand-950);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 40px 20px;
+    }
+
+    /* Phone frame (desktop only) */
+    .phone-frame {
+      width: 390px;
+      height: 844px;
+      background: var(--bg-white);
+      border-radius: 48px;
+      box-shadow: 0 0 0 2px #0D0D0D, 0 0 0 7px #2A2A2A, 0 0 0 9px #0D0D0D, 0 50px 100px rgba(0,0,0,0.5), 0 20px 40px rgba(93,47,112,0.15);
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+    .dynamic-island {
+      position: absolute;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 126px;
+      height: 36px;
+      background: #000;
+      border-radius: 20px;
+      z-index: 100;
+    }
+    .status-bar {
+      height: 54px;
+      padding: 14px 24px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+      z-index: 2;
+      background: var(--bg-white);
+    }
+    .status-time { font-size: 15px; font-weight: 600; color: var(--text-strong); }
+    .status-icons { display: flex; align-items: center; gap: 6px; }
+    .status-icons svg { width: 18px; height: 12px; fill: var(--text-strong); }
+    .home-ind {
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      background: var(--bg-white);
+    }
+    .home-ind-bar {
+      width: 130px;
+      height: 5px;
+      background: #000;
+      border-radius: 100px;
+    }
+
+    @media (max-width: 430px) {
+      body { background: var(--bg-white); padding: 0; display: block; }
+      .phone-frame { width: 100%; height: 100vh; border-radius: 0; box-shadow: none; }
+      .dynamic-island { display: none; }
+      .status-bar { display: none !important; }
+      .home-ind { display: none !important; }
+    }
+
+    /* Screens */
+    .screen { display: none; flex-direction: column; height: 100%; overflow: hidden; }
+    .screen.active { display: flex; }
+
+    /* Top bar */
+    .top-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 4px 20px 12px;
+      background: var(--bg-white);
+      flex-shrink: 0;
+    }
+    .top-bar-back, .top-bar-action {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      border: 1px solid var(--stroke-soft);
+      background: var(--bg-white);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: var(--text-sub);
+      flex-shrink: 0;
+      transition: background 0.12s;
+    }
+    .top-bar-back:active, .top-bar-action:active { background: var(--bg-weak); }
+    .top-bar-title {
+      font-size: 18px; font-weight: 600; color: var(--text-strong);
+      flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .top-bar-sub {
+      font-size: 11px; font-weight: 400; color: var(--text-soft);
+      margin-top: 1px;
+    }
+    .top-bar-title-wrap { flex: 1; min-width: 0; }
+
+    /* Segmented control */
+    .seg-wrap { padding: 0 20px 12px; background: var(--bg-white); flex-shrink: 0; }
+    .seg {
+      display: grid;
+      gap: 4px; padding: 4px;
+      background: var(--bg-weak); border-radius: 10px;
+    }
+    .seg.cols-2 { grid-template-columns: 1fr 1fr; }
+    .seg.cols-3 { grid-template-columns: repeat(3, 1fr); }
+    .seg.cols-4 { grid-template-columns: repeat(4, 1fr); }
+    .seg .seg-opt {
+      height: 36px; border-radius: 7px;
+      background: transparent; border: none; cursor: pointer;
+      font-family: var(--font-family); font-size: 12px; font-weight: 500;
+      color: var(--text-sub);
+      display: flex; align-items: center; justify-content: center; gap: 4px;
+      transition: all 0.15s;
+      position: relative;
+      white-space: nowrap;
+    }
+    .seg .seg-opt.active {
+      background: var(--bg-white);
+      color: var(--text-strong);
+      box-shadow: 0 1px 2px rgba(17,17,17,0.04), 0 2px 6px rgba(17,17,17,0.06);
+      font-weight: 600;
+    }
+    .seg .seg-opt .count {
+      font-size: 10px; padding: 1px 5px;
+      background: var(--info-lighter); color: var(--primary-base);
+      border-radius: 8px; font-weight: 600;
+    }
+    .seg .seg-opt.active .count { background: var(--brand-100); }
+
+    /* Scrollable body */
+    .scroll-area {
+      flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch;
+      padding-bottom: 0;
+    }
+    .scroll-content { padding: 4px 20px 24px; }
+    .scroll-content.with-footer { padding-bottom: 96px; }
+    .scroll-content.with-tabbar { padding-bottom: 80px; }
+
+    /* Bottom tab bar (root screens only) */
+    .bottom-tab-bar {
+      position: absolute;
+      left: 0; right: 0; bottom: 28px;
+      height: 68px;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: saturate(140%) blur(12px);
+      -webkit-backdrop-filter: saturate(140%) blur(12px);
+      border-top: 1px solid var(--stroke-soft);
+      display: flex;
+      align-items: stretch;
+      z-index: 8;
+      padding: 4px 0 0;
+    }
+    .bottom-tab-bar .tab {
+      position: relative;
+      flex: 1;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 4px;
+      background: none; border: none;
+      cursor: pointer;
+      font-family: var(--font-family);
+      font-size: 10px; font-weight: 600;
+      letter-spacing: 0.1px;
+      color: var(--text-soft);
+      transition: color 0.12s;
+      padding: 8px 4px 4px;
+    }
+    .bottom-tab-bar .tab svg { width: 22px; height: 22px; transition: transform 0.18s ease-out; }
+    .bottom-tab-bar .tab.active { color: var(--primary-base); }
+    .bottom-tab-bar .tab.active svg { transform: translateY(-1px); }
+    .bottom-tab-bar .tab.active::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 50%;
+      transform: translateX(-50%);
+      width: 28px; height: 3px;
+      border-radius: 0 0 3px 3px;
+      background: linear-gradient(90deg, #6E3785, #5D2F70);
+    }
+    .bottom-tab-bar .tab .badge-dot {
+      position: absolute;
+      transform: translate(10px, -8px);
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--error-base);
+      border: 2px solid var(--bg-white);
+    }
+
+    /* FAB */
+    .fab {
+      position: absolute;
+      right: 16px; bottom: 108px;
+      height: 52px;
+      padding: 0 20px 0 16px;
+      border-radius: 26px;
+      background: linear-gradient(135deg, #6E3785 0%, #5D2F70 60%, #4C285B 100%);
+      color: #fff;
+      display: flex; align-items: center; gap: 8px;
+      font-family: var(--font-family); font-size: 14px; font-weight: 600;
+      letter-spacing: -0.1px;
+      border: none; cursor: pointer;
+      box-shadow:
+        0 1px 0 rgba(255,255,255,0.12) inset,
+        0 12px 28px rgba(93,47,112,0.4),
+        0 4px 10px rgba(93,47,112,0.25);
+      z-index: 7;
+      transition: transform 0.12s, box-shadow 0.15s;
+    }
+    .fab:active { transform: scale(0.96); box-shadow: 0 6px 16px rgba(93,47,112,0.35); }
+    .fab svg { width: 18px; height: 18px; }
+
+    /* Sticky footer button bar */
+    .footer-bar {
+      position: absolute;
+      left: 0; right: 0; bottom: 28px;
+      padding: 12px 20px;
+      background: linear-gradient(to top, var(--bg-white) 60%, rgba(255,255,255,0));
+      pointer-events: none;
+      z-index: 5;
+      display: flex;
+      gap: 10px;
+    }
+    .footer-bar .btn { pointer-events: auto; }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+      height: 44px; padding: 0 16px;
+      border: 1px solid transparent; border-radius: 8px;
+      font-family: var(--font-family);
+      font-size: 13px; font-weight: 600;
+      cursor: pointer;
+      transition: all 0.12s;
+      background: var(--bg-white);
+      color: var(--text-strong);
+    }
+    .btn:active { transform: scale(0.985); }
+    .btn-md { height: 44px; }
+    .btn-sm { height: 40px; font-size: 13px; }
+    .btn-xs { height: 36px; padding: 0 12px; font-size: 12px; }
+    .btn-block { width: 100%; }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #6E3785 0%, #5D2F70 60%, #4C285B 100%);
+      color: #fff;
+      border-color: var(--primary-base);
+      box-shadow:
+        0 1px 0 rgba(255,255,255,0.12) inset,
+        0 6px 14px rgba(93,47,112,0.28),
+        0 2px 4px rgba(93,47,112,0.18);
+      letter-spacing: -0.1px;
+    }
+    .btn-primary.outlined {
+      background: transparent; color: var(--primary-base);
+      box-shadow: none;
+    }
+    .btn-natural {
+      background: var(--bg-white); color: var(--text-sub);
+      border-color: var(--stroke-sub);
+    }
+    .btn-natural.outlined { background: transparent; }
+    .btn-error {
+      background: var(--error-base); color: #fff;
+      border-color: var(--error-base);
+    }
+    .btn-error.outlined {
+      background: transparent; color: var(--error-base);
+    }
+    .btn-warning.outlined {
+      background: var(--warning-lighter); color: var(--warning-dark);
+      border-color: var(--warning-light);
+    }
+    .btn-success {
+      background: var(--success-base); color: #fff;
+      border-color: var(--success-base);
+    }
+    .btn:disabled {
+      background: var(--bg-soft); color: var(--text-disabled);
+      border-color: var(--bg-soft); box-shadow: none; cursor: not-allowed;
+    }
+
+    /* Status pills (FO status) */
+    .status-pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 3px 9px 3px 8px; border-radius: 20px;
+      font-size: 11px; font-weight: 600;
+      letter-spacing: -0.1px;
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+    .status-pill .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+    .status-pill.gray { background: var(--bg-weak); color: var(--text-sub); }
+    .status-pill.gray .dot { background: var(--text-soft); }
+    .status-pill.blue { background: var(--sky-lighter); color: #124B68; }
+    .status-pill.blue .dot { background: var(--sky-base); box-shadow: 0 0 0 3px rgba(71,194,255,0.18); }
+    .status-pill.purple { background: var(--info-lighter); color: var(--primary-base); }
+    .status-pill.purple .dot { background: var(--primary-base); box-shadow: 0 0 0 3px rgba(93,47,112,0.16); }
+    .status-pill.green { background: var(--success-lighter); color: var(--success-dark); }
+    .status-pill.green .dot { background: var(--success-base); box-shadow: 0 0 0 3px rgba(31,193,107,0.2); }
+    .status-pill.orange { background: var(--warning-lighter); color: var(--warning-dark); }
+    .status-pill.orange .dot { background: var(--warning-base); box-shadow: 0 0 0 3px rgba(250,115,25,0.18); }
+    .status-pill.red { background: var(--error-lighter); color: var(--error-dark); }
+    .status-pill.red .dot { background: var(--error-base); box-shadow: 0 0 0 3px rgba(251,55,72,0.18); }
+    .status-pill.feature { background: var(--purple-lighter); color: #4C25A7; }
+    .status-pill.feature .dot { background: var(--purple-base); box-shadow: 0 0 0 3px rgba(125,82,244,0.18); }
+
+    /* Priority chip (STANDARD / RUSH / EMERGENCY) */
+    .prio-chip {
+      display: inline-flex; align-items: center;
+      padding: 2px 8px; border-radius: 4px;
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 0.6px;
+      flex-shrink: 0;
+      text-transform: uppercase;
+      border: 1px solid transparent;
+    }
+    .prio-chip.standard { background: var(--bg-weak); color: var(--text-sub); border-color: var(--stroke-soft); }
+    .prio-chip.rush { background: var(--yellow-lighter); color: #86661D; border-color: rgba(246,181,30,0.25); }
+    .prio-chip.emergency { background: var(--error-lighter); color: var(--error-dark); border-color: rgba(251,55,72,0.2); }
+
+    /* Cards (FO / Pick / Shipment) */
+    .card {
+      background: var(--bg-white);
+      border: 1px solid var(--stroke-soft);
+      border-radius: 14px;
+      padding: 14px 14px 12px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: all 0.15s;
+      box-shadow: 0 1px 2px rgba(17,17,17,0.03), 0 2px 6px rgba(17,17,17,0.025);
+    }
+    .card:hover { border-color: var(--stroke-sub); box-shadow: 0 2px 4px rgba(17,17,17,0.04), 0 6px 14px rgba(93,47,112,0.06); }
+    .card:active { transform: scale(0.99); background: var(--bg-weak); }
+    .card-row1 {
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: 6px;
+      flex-wrap: wrap;
+    }
+    .card-id {
+      font-size: 14px; font-weight: 700; color: var(--text-strong);
+      letter-spacing: -0.2px;
+    }
+    .card-sub-id {
+      font-size: 12px; color: var(--text-sub); font-weight: 500;
+    }
+    .card-project {
+      font-size: 12px; color: var(--text-sub);
+      display: flex; align-items: center; gap: 6px;
+      margin-bottom: 4px;
+    }
+    .card-project svg { width: 13px; height: 13px; color: var(--text-soft); flex-shrink: 0; }
+    .card-meta {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 8px;
+      font-size: 11px; color: var(--text-soft);
+      margin-top: 4px;
+    }
+    .card-meta .person {
+      display: flex; align-items: center; gap: 4px;
+    }
+    .card-meta .person svg { width: 12px; height: 12px; }
+    .card-divider {
+      height: 1px; background: var(--stroke-soft);
+      margin: 10px 0 8px;
+    }
+
+    /* Progress bar */
+    .progress {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 8px;
+      margin-top: 4px;
+    }
+    .progress-text {
+      font-size: 11px; color: var(--text-sub); font-weight: 500;
+      flex-shrink: 0;
+    }
+    .progress-bar {
+      flex: 1; height: 5px;
+      background: var(--bg-soft); border-radius: 3px; overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%; background: var(--success-base);
+      border-radius: 3px; transition: width 0.3s;
+    }
+    .progress-fill.warning { background: var(--warning-base); }
+    .progress-pct {
+      font-size: 11px; color: var(--text-sub); font-weight: 600;
+      flex-shrink: 0; min-width: 28px; text-align: right;
+    }
+
+    /* Inline approve/reject for MR cards */
+    .card-actions {
+      display: flex; gap: 8px;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid var(--stroke-soft);
+    }
+    .card-actions .btn { flex: 1; height: 36px; font-size: 12px; }
+
+    /* Sections (collapsible) */
+    .section {
+      margin-bottom: 10px;
+      border: 1px solid var(--stroke-soft);
+      border-radius: 14px;
+      overflow: hidden;
+      background: var(--bg-white);
+      box-shadow: 0 1px 2px rgba(17,17,17,0.03);
+    }
+    .section-hdr {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 14px;
+      cursor: pointer; user-select: none;
+    }
+    .section-hdr:active { background: var(--bg-weak); }
+    .sh-left { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; }
+    .sh-icon {
+      width: 28px; height: 28px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .sh-icon.purple { background: var(--info-lighter); color: var(--primary-base); }
+    .sh-icon.blue { background: var(--sky-lighter); color: #1F7EAD; }
+    .sh-icon.gray { background: var(--bg-weak); color: var(--text-sub); }
+    .sh-title { font-size: 13px; font-weight: 600; color: var(--text-strong); }
+    .sh-right { display: flex; align-items: center; gap: 8px; color: var(--text-soft); }
+    .sh-meta { font-size: 11px; color: var(--text-soft); }
+    .sh-chev { transition: transform 0.2s; flex-shrink: 0; }
+    .section.collapsed .sh-chev { transform: rotate(-90deg); }
+    .section-body {
+      padding: 12px 14px 14px;
+      border-top: 1px solid var(--stroke-soft);
+    }
+    .section.collapsed .section-body { display: none; }
+
+    /* Key-value grid in section bodies */
+    .kv-grid {
+      display: grid; grid-template-columns: auto 1fr;
+      gap: 6px 12px;
+    }
+    .kv-grid .k {
+      font-size: 11px; color: var(--text-soft);
+      text-transform: uppercase; letter-spacing: 0.4px;
+      font-weight: 500;
+    }
+    .kv-grid .v {
+      font-size: 13px; color: var(--text-strong); font-weight: 500;
+    }
+
+    /* Items table (FO Details, Confirm Delivery) */
+    .items-table {
+      border: 1px solid var(--stroke-soft);
+      border-radius: 14px;
+      overflow: hidden;
+      background: var(--bg-white);
+      margin-bottom: 10px;
+      box-shadow: 0 1px 2px rgba(17,17,17,0.03);
+    }
+    .items-table-hdr {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 14px;
+      background: var(--bg-weak);
+      border-bottom: 1px solid var(--stroke-soft);
+    }
+    .items-table-title { font-size: 13px; font-weight: 600; color: var(--text-strong); }
+    .items-table-sub { font-size: 11px; color: var(--text-sub); }
+    .item-row {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--stroke-soft);
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .item-row:last-child { border-bottom: none; }
+    .item-head {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      gap: 10px;
+    }
+    .item-name {
+      font-size: 13px; font-weight: 500; color: var(--text-strong);
+      line-height: 1.4;
+    }
+    .item-sku {
+      font-size: 11px; color: var(--text-soft);
+      margin-top: 2px;
+    }
+    .item-qty-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 4px;
+      margin-top: 6px;
+      padding-top: 8px;
+      border-top: 1px dashed var(--stroke-soft);
+    }
+    .item-qty-cell {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 1px;
+    }
+    .item-qty-label {
+      font-size: 9px; color: var(--text-soft);
+      text-transform: uppercase; letter-spacing: 0.4px;
+      font-weight: 600;
+    }
+    .item-qty-val {
+      font-size: 14px; font-weight: 600; color: var(--text-strong);
+    }
+    .item-qty-val.pending { color: var(--text-soft); }
+
+    /* Quantity stepper */
+    .qty-stepper {
+      display: inline-flex; align-items: center;
+      border: 1px solid var(--stroke-soft);
+      border-radius: 10px;
+      overflow: hidden;
+      background: var(--bg-white);
+      height: 38px;
+      box-shadow: 0 1px 2px rgba(17,17,17,0.04);
+    }
+    .qty-stepper button {
+      width: 34px; height: 100%;
+      border: none; background: var(--bg-white);
+      color: var(--primary-base);
+      font-family: var(--font-family); font-size: 18px; font-weight: 700;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.12s;
+    }
+    .qty-stepper button:active { background: var(--brand-50); }
+    .qty-stepper button:disabled { color: var(--text-disabled); cursor: not-allowed; background: var(--bg-weak); }
+    .qty-stepper input {
+      width: 52px; height: 100%;
+      border: none; border-left: 1px solid var(--stroke-soft);
+      border-right: 1px solid var(--stroke-soft);
+      text-align: center;
+      font-family: var(--font-family); font-size: 14px; font-weight: 700;
+      color: var(--text-strong);
+      outline: none;
+      background: var(--bg-white);
+      letter-spacing: -0.2px;
+    }
+    .qty-stepper input:focus { background: var(--brand-50); }
+
+    /* Pick-line row (S2) */
+    .pick-line {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--stroke-soft);
+    }
+    .pick-line:last-child { border-bottom: none; }
+    .pick-line.flagged { background: var(--error-lighter); }
+    .pick-line.done { background: var(--success-lighter); }
+    .pl-head {
+      display: flex; gap: 10px;
+      margin-bottom: 8px;
+    }
+    .pl-num {
+      width: 24px; height: 24px;
+      border-radius: 6px;
+      background: var(--info-lighter); color: var(--primary-base);
+      font-size: 11px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .pick-line.done .pl-num { background: var(--success-base); color: #fff; }
+    .pick-line.flagged .pl-num { background: var(--error-base); color: #fff; }
+    .pl-info { flex: 1; min-width: 0; }
+    .pl-name { font-size: 13px; font-weight: 500; color: var(--text-strong); line-height: 1.35; }
+    .pl-sku { font-size: 11px; color: var(--text-soft); margin-top: 2px; }
+    .pl-meta {
+      display: flex; gap: 12px;
+      font-size: 11px; color: var(--text-sub);
+      margin-top: 6px;
+    }
+    .pl-meta strong { color: var(--text-strong); font-weight: 600; }
+    .pl-actions {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 10px;
+      margin-top: 8px;
+    }
+    .pl-flag-btn {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 6px 10px; border-radius: 6px;
+      background: var(--bg-weak); color: var(--text-sub);
+      border: 1px solid var(--stroke-soft);
+      font-family: var(--font-family); font-size: 11px; font-weight: 500;
+      cursor: pointer; transition: all 0.12s;
+    }
+    .pl-flag-btn:active { background: var(--warning-lighter); color: var(--warning-dark); }
+    .pl-flag-btn.active {
+      background: var(--error-lighter); color: var(--error-dark);
+      border-color: var(--error-light);
+    }
+    .pl-exception-note {
+      padding: 8px 10px;
+      background: var(--bg-white); border: 1px dashed var(--error-light);
+      border-radius: 6px;
+      font-size: 11px; color: var(--error-dark);
+      margin-top: 6px;
+    }
+    .pl-actions-ro {
+      padding: 8px 12px;
+      background: var(--bg-white);
+      border: 1px solid var(--stroke-soft);
+      border-radius: 10px;
+    }
+    .pl-ro-summary { display: flex; align-items: baseline; gap: 8px; }
+    .pl-ro-label {
+      font-size: 10px; color: var(--text-soft);
+      text-transform: uppercase; letter-spacing: 0.4px;
+      font-weight: 600;
+    }
+    .pl-ro-value { font-size: 16px; font-weight: 700; color: var(--text-strong); letter-spacing: -0.3px; }
+    .pl-ro-of { font-size: 12px; font-weight: 500; color: var(--text-soft); margin-left: 2px; }
+    .pl-ro-check {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 11px; font-weight: 500;
+      color: var(--text-soft);
+    }
+    .pl-ro-check svg { color: var(--success-base); }
+    .pl-ro-flag {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 4px 10px; border-radius: 6px;
+      background: var(--error-lighter); color: var(--error-dark);
+      font-size: 11px; font-weight: 600;
+    }
+
+    /* Activity timeline */
+    .activity {
+      display: flex; flex-direction: column;
+      gap: 14px;
+    }
+    .act-item {
+      display: flex; gap: 10px;
+      position: relative;
+    }
+    .act-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--primary-base);
+      flex-shrink: 0;
+      margin-top: 4px;
+      position: relative;
+      z-index: 2;
+    }
+    .act-line {
+      position: absolute;
+      left: 3px; top: 14px; bottom: -14px;
+      width: 2px;
+      background: var(--stroke-soft);
+      z-index: 1;
+    }
+    .act-item:last-child .act-line { display: none; }
+    .act-body { flex: 1; min-width: 0; padding-bottom: 0; }
+    .act-meta {
+      font-size: 11px; color: var(--text-sub);
+      margin-bottom: 2px;
+    }
+    .act-meta b { color: var(--text-strong); font-weight: 600; }
+    .act-title { font-size: 12px; color: var(--text-strong); font-weight: 500; }
+
+    /* Form fields */
+    .merlin-text-field, .merlin-dropdown {
+      display: flex; flex-direction: column; gap: 6px;
+      margin-bottom: 14px;
+    }
+    .input-label {
+      font-size: 13px; font-weight: 500; color: var(--text-sub);
+      display: flex; align-items: center; gap: 4px;
+    }
+    .input-label .required { color: var(--primary-base); }
+    .input-label .optional {
+      font-size: 11px; font-weight: 400; color: var(--text-soft); margin-left: 4px;
+    }
+    .input-wrapper {
+      position: relative;
+      display: flex; align-items: center; gap: 8px;
+      border: 1px solid var(--stroke-soft);
+      border-radius: 8px;
+      padding: 0 12px;
+      background: var(--bg-white);
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .input-wrapper:focus-within {
+      border-color: var(--brand-400);
+      box-shadow: 0 0 0 3px rgba(110,55,133,0.08);
+    }
+    .input-wrapper input,
+    .input-wrapper select,
+    .input-wrapper textarea {
+      flex: 1; border: none; outline: none; background: transparent;
+      font-family: var(--font-family); font-size: 14px;
+      color: var(--text-strong);
+      padding: 11px 0; width: 100%;
+    }
+    .input-wrapper input::placeholder,
+    .input-wrapper textarea::placeholder { color: var(--text-soft); }
+    .input-wrapper textarea { resize: none; min-height: 64px; line-height: 1.5; padding-top: 11px; padding-bottom: 11px; }
+    .input-wrapper.multiline { align-items: flex-start; }
+    .input-wrapper select {
+      appearance: none; -webkit-appearance: none; cursor: pointer;
+    }
+    .input-wrapper select:disabled { color: var(--text-soft); cursor: not-allowed; }
+    .input-wrapper .suffix-icon,
+    .input-wrapper .prefix-icon {
+      width: 18px; height: 18px; color: var(--text-soft); flex-shrink: 0; pointer-events: none;
+    }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .hint-text { font-size: 11px; color: var(--text-soft); }
+
+    /* Priority chip row (form input) */
+    .prio-row {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .prio-opt {
+      height: 40px; padding: 0 8px;
+      border: 1.5px solid var(--stroke-soft);
+      border-radius: 8px;
+      background: var(--bg-white);
+      font-family: var(--font-family); font-size: 12px; font-weight: 600;
+      color: var(--text-sub);
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 5px;
+      transition: all 0.12s;
+    }
+    .prio-opt.active.standard {
+      background: var(--bg-weak); border-color: var(--text-sub); color: var(--text-strong);
+    }
+    .prio-opt.active.rush {
+      background: var(--yellow-lighter); border-color: var(--yellow-base); color: #86661D;
+    }
+    .prio-opt.active.emergency {
+      background: var(--error-lighter); border-color: var(--error-base); color: var(--error-dark);
+    }
+    .prio-opt .dot {
+      width: 6px; height: 6px; border-radius: 50%; background: currentColor;
+    }
+
+    /* WO / Ad-Hoc toggle */
+    /* Line items (S5) */
+    .lineitem-ro {
+      border: 1px solid var(--stroke-soft);
+      border-radius: 12px;
+      padding: 12px 12px 10px;
+      margin-bottom: 10px;
+      background: var(--bg-white);
+      box-shadow: 0 1px 0 rgba(20,20,40,0.02);
+    }
+    .liro-top {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .liro-name { display: flex; align-items: flex-start; gap: 10px; min-width: 0; }
+    .liro-idx {
+      flex-shrink: 0;
+      width: 22px; height: 22px;
+      border-radius: 6px;
+      background: var(--brand-50);
+      color: var(--primary-base);
+      font-size: 11px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      margin-top: 1px;
+    }
+    .liro-mat {
+      font-size: 13px; font-weight: 600;
+      color: var(--text-strong);
+      line-height: 1.25;
+    }
+    .liro-sku {
+      font-size: 10px; color: var(--text-soft);
+      margin-top: 2px;
+      letter-spacing: 0.3px;
+    }
+    .liro-grid {
+      display: grid; grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+      padding-top: 10px;
+      border-top: 1px dashed var(--stroke-soft);
+    }
+    .liro-cell { display: flex; flex-direction: column; }
+    .liro-k {
+      font-size: 9px; color: var(--text-soft);
+      text-transform: uppercase; letter-spacing: 0.4px;
+      font-weight: 600;
+      margin-bottom: 3px;
+    }
+    .liro-v {
+      font-size: 13px; color: var(--text-strong); font-weight: 600;
+    }
+    .liro-v small { font-size: 10px; color: var(--text-sub); font-weight: 500; margin-left: 1px; }
+    .liro-cell-total { text-align: right; }
+    .liro-cell-total .liro-v { color: var(--primary-base); }
+
+    .li-empty {
+      padding: 22px 16px;
+      border: 1.5px dashed var(--stroke-soft);
+      border-radius: 12px;
+      background: var(--bg-weak);
+      text-align: center;
+      color: var(--text-sub);
+      margin-bottom: 10px;
+    }
+    .li-empty svg { color: var(--text-soft); margin-bottom: 6px; }
+    .li-empty-t { font-size: 13px; font-weight: 600; color: var(--text-strong); }
+    .li-empty-s { font-size: 11px; color: var(--text-soft); margin-top: 3px; }
+
+    /* Legacy line items (kept for compat) */
+    .lineitem {
+      border: 1px solid var(--stroke-soft);
+      border-radius: 10px;
+      padding: 10px 12px;
+      margin-bottom: 10px;
+      background: var(--bg-white);
+      position: relative;
+    }
+    .li-head {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .li-num { font-size: 11px; color: var(--text-soft); font-weight: 600; }
+    .li-remove {
+      width: 24px; height: 24px;
+      border: none; background: var(--bg-weak);
+      border-radius: 6px;
+      color: var(--text-sub);
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .li-remove:active { background: var(--error-lighter); color: var(--error-dark); }
+    .li-material { margin-bottom: 8px; }
+    .li-material .input-wrapper input { font-size: 13px; }
+    .li-grid {
+      display: grid; grid-template-columns: 80px 1fr 100px;
+      gap: 8px; align-items: end;
+      margin-bottom: 8px;
+    }
+    .li-mini-label {
+      font-size: 10px; color: var(--text-soft);
+      text-transform: uppercase; letter-spacing: 0.4px;
+      font-weight: 600;
+      margin-bottom: 4px;
+      display: block;
+    }
+    .li-uom {
+      height: 36px;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--bg-weak);
+      border-radius: 6px;
+      font-size: 12px; font-weight: 600; color: var(--text-sub);
+    }
+    .li-price-input {
+      width: 100%; height: 36px;
+      border: 1px solid var(--stroke-soft); border-radius: 6px;
+      padding: 0 8px;
+      font-family: var(--font-family); font-size: 13px;
+      color: var(--text-strong);
+      text-align: right;
+      outline: none;
+      background: var(--bg-white);
+    }
+    .li-price-input:focus { border-color: var(--brand-400); }
+    .li-total-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding-top: 8px;
+      border-top: 1px dashed var(--stroke-soft);
+      font-size: 13px;
+    }
+    .li-total-row .lbl { color: var(--text-sub); font-weight: 500; }
+    .li-total-row .val { color: var(--text-strong); font-weight: 700; }
+    .add-line-btn {
+      width: 100%; height: 40px;
+      border: 1.5px dashed var(--stroke-sub);
+      border-radius: 10px;
+      background: var(--bg-weak);
+      color: var(--primary-base);
+      font-family: var(--font-family); font-size: 13px; font-weight: 600;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      transition: all 0.12s;
+    }
+    .add-line-btn:active { background: var(--info-lighter); border-color: var(--primary-base); }
+    .grand-total {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 14px;
+      background: var(--bg-weak);
+      border: 1px solid var(--stroke-soft);
+      border-radius: 10px;
+      margin-top: 4px;
+    }
+    .grand-total .lbl { font-size: 13px; color: var(--text-sub); font-weight: 600; }
+    .grand-total .val { font-size: 18px; color: var(--text-strong); font-weight: 700; }
+
+    /* Bottom sheet */
+    .scrim {
+      position: absolute; inset: 0;
+      background: rgba(0,0,0,0.45);
+      z-index: 20;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+    .scrim.show { opacity: 1; pointer-events: auto; }
+    .sheet {
+      position: absolute;
+      left: 0; right: 0; bottom: 0;
+      background: var(--bg-white);
+      border-radius: 20px 20px 0 0;
+      z-index: 21;
+      transform: translateY(100%);
+      transition: transform 0.25s ease-out;
+      max-height: 85%;
+      display: flex; flex-direction: column;
+    }
+    .sheet.show { transform: translateY(0); }
+    .sheet-handle {
+      width: 40px; height: 4px;
+      border-radius: 2px;
+      background: var(--stroke-sub);
+      margin: 10px auto 4px;
+      flex-shrink: 0;
+    }
+    .sheet-hdr {
+      padding: 8px 20px 12px;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .sheet-title { font-size: 16px; font-weight: 600; color: var(--text-strong); }
+    .sheet-close {
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      border: 1px solid var(--stroke-soft);
+      background: var(--bg-white);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text-sub); cursor: pointer;
+    }
+    .sheet-body {
+      flex: 1; overflow-y: auto;
+      padding: 0 20px 20px;
+    }
+    .sheet-footer {
+      padding: 12px 20px 28px;
+      border-top: 1px solid var(--stroke-soft);
+      display: flex; gap: 10px;
+      flex-shrink: 0;
+    }
+
+    /* Issue chip grid (exception sheet) */
+    .chip-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .chip-opt {
+      padding: 10px 12px;
+      border: 1.5px solid var(--stroke-soft);
+      border-radius: 8px;
+      background: var(--bg-white);
+      font-family: var(--font-family); font-size: 12px; font-weight: 500;
+      color: var(--text-sub);
+      cursor: pointer;
+      display: flex; align-items: center; gap: 6px;
+      transition: all 0.12s;
+    }
+    .chip-opt:active { background: var(--bg-weak); }
+    .chip-opt.active {
+      background: var(--error-lighter); border-color: var(--error-base);
+      color: var(--error-dark);
+    }
+    .chip-opt svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+    /* Delivery item (S6) */
+    .deliv-item {
+      border: 1px solid var(--stroke-soft);
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin-bottom: 10px;
+      background: var(--bg-white);
+    }
+    .deliv-item.received { border-color: var(--success-light); background: #F8FFFB; }
+    .deliv-item.issue { border-color: var(--warning-light); background: #FFFBF6; }
+    .di-head {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .di-info { flex: 1; min-width: 0; }
+    .di-name { font-size: 13px; font-weight: 500; color: var(--text-strong); line-height: 1.4; }
+    .di-qty { font-size: 11px; color: var(--text-sub); margin-top: 2px; }
+    .di-status-seg {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 4px; padding: 3px;
+      background: var(--bg-weak); border-radius: 7px;
+    }
+    .di-status-seg button {
+      height: 30px; padding: 0 10px;
+      border: none; background: transparent;
+      font-family: var(--font-family); font-size: 11px; font-weight: 600;
+      color: var(--text-soft);
+      border-radius: 5px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 4px;
+    }
+    .di-status-seg button.received.active {
+      background: var(--success-base); color: #fff;
+      box-shadow: 0 1px 3px rgba(31,193,107,0.3);
+    }
+    .di-status-seg button.issue.active {
+      background: var(--warning-base); color: #fff;
+      box-shadow: 0 1px 3px rgba(250,115,25,0.3);
+    }
+    .di-issue-detail {
+      display: none;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px dashed var(--warning-light);
+    }
+    .deliv-item.issue .di-issue-detail { display: block; }
+
+    /* Signature pad */
+    .sig-pad-wrap {
+      border: 1.5px dashed var(--stroke-sub); border-radius: 10px;
+      background: var(--bg-weak); position: relative;
+      height: 140px; overflow: hidden;
+    }
+    .sig-pad-wrap canvas {
+      width: 100%; height: 100%; display: block; cursor: crosshair;
+      touch-action: none;
+    }
+    .sig-placeholder {
+      position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%);
+      color: var(--text-soft); font-size: 12px; pointer-events: none;
+    }
+    .sig-pad-wrap.signed { border-style: solid; border-color: var(--success-base); background: var(--bg-white); }
+    .sig-pad-wrap.signed .sig-placeholder { display: none; }
+    .sig-actions {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-top: 6px;
+    }
+    .sig-clear {
+      background: none; border: none; color: var(--primary-base);
+      font-family: var(--font-family); font-size: 12px; font-weight: 600;
+      cursor: pointer; padding: 4px 0;
+    }
+    .sig-stamp { font-size: 11px; color: var(--text-sub); }
+    .sig-stamp.signed { color: var(--success-dark); font-weight: 500; }
+
+    /* Toast */
+    .toast {
+      position: absolute;
+      left: 50%; bottom: 120px;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--text-strong); color: #fff;
+      padding: 12px 18px; border-radius: 12px;
+      font-size: 13px; font-weight: 500;
+      display: flex; align-items: center; gap: 8px;
+      z-index: 50;
+      opacity: 0;
+      transition: all 0.3s ease-out;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      pointer-events: none;
+      max-width: 320px;
+    }
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+    .toast .icon {
+      width: 22px; height: 22px; border-radius: 50%;
+      background: var(--success-base); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .toast.warning .icon { background: var(--warning-base); }
+    .toast.info .icon { background: var(--primary-base); }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center;
+      padding: 50px 30px 20px;
+      color: var(--text-sub);
+    }
+    .empty-illus {
+      width: 60px; height: 60px;
+      border-radius: 50%;
+      background: var(--info-lighter); color: var(--primary-base);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 14px;
+    }
+    .empty-title {
+      font-size: 14px; font-weight: 600; color: var(--text-strong);
+      margin-bottom: 4px;
+    }
+    .empty-sub { font-size: 12px; color: var(--text-sub); line-height: 1.5; }
+
+    /* "Remainder of" badge */
+    .remainder-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 2px 6px; border-radius: 4px;
+      font-size: 10px; font-weight: 500;
+      background: var(--purple-lighter); color: #4C25A7;
+    }
+
+    /* Tab header (top of root screens) */
+    .root-hdr {
+      padding: 4px 20px 12px;
+      display: flex; align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+      background: var(--bg-white);
+    }
+    .root-hdr-titles { flex: 1; min-width: 0; }
+    .root-hdr-title { font-size: 22px; font-weight: 700; color: var(--text-strong); letter-spacing: -0.5px; line-height: 1.15; }
+    .root-hdr-sub { font-size: 12px; color: var(--text-soft); margin-top: 3px; font-weight: 500; }
+    .root-hdr-back {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      border: 1px solid var(--stroke-soft);
+      background: var(--bg-white);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text-sub); cursor: pointer;
+      flex-shrink: 0;
+    }
+    .root-hdr-back:active { background: var(--bg-weak); }
+    .root-hdr-action {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      border: 1px solid var(--stroke-soft);
+      background: var(--bg-white);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text-sub); cursor: pointer;
+      flex-shrink: 0;
+    }
+    .root-hdr-cta {
+      height: 36px;
+      padding: 0 12px 0 10px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, #6E3785 0%, #5D2F70 60%, #4C285B 100%);
+      color: #fff;
+      border: none;
+      display: inline-flex; align-items: center; gap: 6px;
+      font-family: var(--font-family); font-size: 12px; font-weight: 600;
+      letter-spacing: -0.1px;
+      cursor: pointer;
+      flex-shrink: 0;
+      box-shadow:
+        0 1px 0 rgba(255,255,255,0.12) inset,
+        0 4px 10px rgba(93,47,112,0.28);
+      transition: transform 0.12s, box-shadow 0.15s;
+    }
+    .root-hdr-cta:active { transform: scale(0.96); }
+    .root-hdr-cta svg { stroke: currentColor; }
+
+    /* CTA pill (sticky on FO Details) */
+    .cta-stack { flex-direction: column; }
+    .cta-stack .cta-shortage {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      width: 100%;
+    }
+    .cta-stack .cta-shortage .btn { height: 40px; font-size: 11px; padding: 0 6px; }
+
+    /* Detail header card (FO Details) */
+    .detail-hdr {
+      margin: 4px 20px 14px;
+      padding: 18px 18px 16px;
+      background:
+        radial-gradient(120% 100% at 0% 0%, rgba(125,82,244,0.06) 0%, transparent 60%),
+        linear-gradient(135deg, var(--brand-50) 0%, #FCFAFE 60%, #fff 100%);
+      border: 1px solid var(--brand-100);
+      border-radius: 16px;
+      box-shadow: 0 2px 6px rgba(93,47,112,0.06), 0 12px 28px rgba(93,47,112,0.06);
+    }
+    .detail-hdr-row {
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: 4px;
+      flex-wrap: wrap;
+    }
+    .detail-hdr-id {
+      font-size: 22px; font-weight: 700; color: var(--text-strong);
+      letter-spacing: -0.5px;
+      margin-right: 2px;
+    }
+    .detail-hdr-project {
+      font-size: 13px; color: var(--text-sub);
+      display: flex; align-items: center; gap: 6px;
+      margin-top: 6px;
+      font-weight: 500;
+    }
+    .detail-hdr-project svg { width: 14px; height: 14px; color: var(--primary-base); }
+    .detail-hdr-remainder { margin-top: 8px; }
+
+    /* Shipment card extras */
+    .ship-meta-row {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid var(--stroke-soft);
+      font-size: 11px;
+    }
+    .ship-meta-cell .k {
+      font-size: 9px; color: var(--text-soft);
+      text-transform: uppercase; letter-spacing: 0.4px;
+      font-weight: 600;
+      margin-bottom: 1px;
+    }
+    .ship-meta-cell .v {
+      font-size: 12px; color: var(--text-strong); font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+  <div class="phone-frame">
+    <div class="dynamic-island"></div>
+
+    <!-- ==================== SCREEN 1: PICK QUEUE ==================== -->
+    <div class="screen active" id="screen-picks">
+      <div class="status-bar">
+        <span class="status-time">9:41</span>
+        <span class="status-icons">
+          <svg viewBox="0 0 16 12"><path d="M0 12h2v-3H0v3zm4 0h2V7H4v5zm4 0h2V4H8v8zm4 0h2V0h-2v12z"/></svg>
+          <svg viewBox="0 0 16 12"><path d="M8 2c2.5 0 4.7 1 6.4 2.6l1.4-1.4C13.8 1 11 0 8 0S2.2 1 0 3.2l1.4 1.4C3.3 3 5.5 2 8 2zm0 4c1.4 0 2.6.5 3.5 1.4l1.4-1.4C11.6 4.8 9.9 4 8 4s-3.6.8-4.9 2l1.4 1.4C5.4 6.5 6.6 6 8 6zm0 4c.8 0 1.5.3 2 .9L8 12l-2-1.1c.5-.5 1.2-.9 2-.9z"/></svg>
+          <svg viewBox="0 0 24 12"><rect x="1" y="1" width="20" height="10" rx="2" stroke="currentColor" stroke-width="1" fill="none"/><rect x="3" y="3" width="16" height="6" rx="1" fill="currentColor"/><rect x="22" y="4" width="1.5" height="4" rx="0.5" fill="currentColor"/></svg>
+        </span>
+      </div>
+
+      <div class="root-hdr">
+        <button class="root-hdr-back" onclick="exitToApp()" aria-label="Back to app">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        </button>
+        <div class="root-hdr-titles">
+          <div class="root-hdr-title">Pick & Pack</div>
+          <div class="root-hdr-sub" id="picksHdrSub">— pick lists waiting</div>
+        </div>
+      </div>
+
+      <div class="seg-wrap">
+        <div class="seg cols-2" id="pickSeg">
+          <button class="seg-opt active" data-tab="to-pick" onclick="setPickTab('to-pick')">To Pick <span class="count" id="cntToPick">0</span></button>
+          <button class="seg-opt" data-tab="completed" onclick="setPickTab('completed')">Completed <span class="count" id="cntCompleted">0</span></button>
+        </div>
+      </div>
+
+      <div class="scroll-area">
+        <div class="scroll-content with-tabbar" id="pickList"></div>
+      </div>
+
+      <div class="bottom-tab-bar">
+        <button class="tab active" data-tab="picks" onclick="goTab('picks')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          Picks
+        </button>
+        <button class="tab" data-tab="orders" onclick="goTab('orders')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
+          Orders
+        </button>
+        <button class="tab" data-tab="shipments" onclick="goTab('shipments')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+          Shipments
+        </button>
+      </div>
+
+      <div class="home-ind"><div class="home-ind-bar"></div></div>
+    </div>
+
+    <!-- ==================== SCREEN 2: ACTIVE PICK LIST ==================== -->
+    <div class="screen" id="screen-pick-detail">
+      <div class="status-bar">
+        <span class="status-time">9:41</span>
+        <span class="status-icons">
+          <svg viewBox="0 0 16 12"><path d="M0 12h2v-3H0v3zm4 0h2V7H4v5zm4 0h2V4H8v8zm4 0h2V0h-2v12z"/></svg>
+          <svg viewBox="0 0 16 12"><path d="M8 2c2.5 0 4.7 1 6.4 2.6l1.4-1.4C13.8 1 11 0 8 0S2.2 1 0 3.2l1.4 1.4C3.3 3 5.5 2 8 2zm0 4c1.4 0 2.6.5 3.5 1.4l1.4-1.4C11.6 4.8 9.9 4 8 4s-3.6.8-4.9 2l1.4 1.4C5.4 6.5 6.6 6 8 6zm0 4c.8 0 1.5.3 2 .9L8 12l-2-1.1c.5-.5 1.2-.9 2-.9z"/></svg>
+          <svg viewBox="0 0 24 12"><rect x="1" y="1" width="20" height="10" rx="2" stroke="currentColor" stroke-width="1" fill="none"/><rect x="3" y="3" width="16" height="6" rx="1" fill="currentColor"/><rect x="22" y="4" width="1.5" height="4" rx="0.5" fill="currentColor"/></svg>
+        </span>
+      </div>
+      <div class="top-bar">
+        <button class="top-bar-back" onclick="goBack()" aria-label="Back">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        </button>
+        <div class="top-bar-title-wrap">
+          <div class="top-bar-title" id="pdTitle">PK-1006</div>
+          <div class="top-bar-sub" id="pdSub">Linked to FO-1004</div>
+        </div>
+      </div>
+
+      <div class="scroll-area">
+        <div class="scroll-content with-footer" id="pickDetailBody"></div>
+      </div>
+
+      <div class="footer-bar" id="pickFooter">
+        <button class="btn btn-warning outlined" style="flex:1" onclick="confirmPick('partial')">Pick partial</button>
+        <button class="btn btn-primary" style="flex:1.4" id="pdCompleteBtn" onclick="confirmPick('complete')">Pick complete</button>
+      </div>
+
+      <div class="home-ind"><div class="home-ind-bar"></div></div>
+    </div>
+
+    <!-- ==================== SCREEN 3: ORDERS DASHBOARD ==================== -->
+    <div class="screen" id="screen-orders">
+      <div class="status-bar">
+        <span class="status-time">9:41</span>
+        <span class="status-icons">
+          <svg viewBox="0 0 16 12"><path d="M0 12h2v-3H0v3zm4 0h2V7H4v5zm4 0h2V4H8v8zm4 0h2V0h-2v12z"/></svg>
+          <svg viewBox="0 0 16 12"><path d="M8 2c2.5 0 4.7 1 6.4 2.6l1.4-1.4C13.8 1 11 0 8 0S2.2 1 0 3.2l1.4 1.4C3.3 3 5.5 2 8 2zm0 4c1.4 0 2.6.5 3.5 1.4l1.4-1.4C11.6 4.8 9.9 4 8 4s-3.6.8-4.9 2l1.4 1.4C5.4 6.5 6.6 6 8 6zm0 4c.8 0 1.5.3 2 .9L8 12l-2-1.1c.5-.5 1.2-.9 2-.9z"/></svg>
+          <svg viewBox="0 0 24 12"><rect x="1" y="1" width="20" height="10" rx="2" stroke="currentColor" stroke-width="1" fill="none"/><rect x="3" y="3" width="16" height="6" rx="1" fill="currentColor"/><rect x="22" y="4" width="1.5" height="4" rx="0.5" fill="currentColor"/></svg>
+        </span>
+      </div>
+
+      <div class="root-hdr">
+        <button class="root-hdr-back" onclick="exitToApp()" aria-label="Back to app">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        </button>
+        <div class="root-hdr-titles">
+          <div class="root-hdr-title">Orders</div>
+          <div class="root-hdr-sub">Fulfillment orders across your projects</div>
+        </div>
+        <button class="root-hdr-cta" onclick="openCallOff()" aria-label="Raise Call-off">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          <span>Call-off</span>
+        </button>
+      </div>
+
+      <div class="seg-wrap">
+        <div class="seg cols-3" id="orderSeg">
+          <button class="seg-opt active" data-tab="approval" onclick="setOrderTab('approval')">Approval</button>
+          <button class="seg-opt" data-tab="today" onclick="setOrderTab('today')">Today</button>
+          <button class="seg-opt" data-tab="all" onclick="setOrderTab('all')">All</button>
+        </div>
+      </div>
+
+      <div class="scroll-area">
+        <div class="scroll-content with-tabbar" id="orderList"></div>
+      </div>
+
+      <div class="bottom-tab-bar">
+        <button class="tab" data-tab="picks" onclick="goTab('picks')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          Picks
+        </button>
+        <button class="tab active" data-tab="orders" onclick="goTab('orders')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
+          Orders
+        </button>
+        <button class="tab" data-tab="shipments" onclick="goTab('shipments')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+          Shipments
+        </button>
+      </div>
+
+      <div class="home-ind"><div class="home-ind-bar"></div></div>
+    </div>
+
+    <!-- ==================== SCREEN 4: FO DETAILS ==================== -->
+    <div class="screen" id="screen-fo-detail">
+      <div class="status-bar">
+        <span class="status-time">9:41</span>
+        <span class="status-icons">
+          <svg viewBox="0 0 16 12"><path d="M0 12h2v-3H0v3zm4 0h2V7H4v5zm4 0h2V4H8v8zm4 0h2V0h-2v12z"/></svg>
+          <svg viewBox="0 0 16 12"><path d="M8 2c2.5 0 4.7 1 6.4 2.6l1.4-1.4C13.8 1 11 0 8 0S2.2 1 0 3.2l1.4 1.4C3.3 3 5.5 2 8 2zm0 4c1.4 0 2.6.5 3.5 1.4l1.4-1.4C11.6 4.8 9.9 4 8 4s-3.6.8-4.9 2l1.4 1.4C5.4 6.5 6.6 6 8 6zm0 4c.8 0 1.5.3 2 .9L8 12l-2-1.1c.5-.5 1.2-.9 2-.9z"/></svg>
+          <svg viewBox="0 0 24 12"><rect x="1" y="1" width="20" height="10" rx="2" stroke="currentColor" stroke-width="1" fill="none"/><rect x="3" y="3" width="16" height="6" rx="1" fill="currentColor"/><rect x="22" y="4" width="1.5" height="4" rx="0.5" fill="currentColor"/></svg>
+        </span>
+      </div>
+      <div class="top-bar">
+        <button class="top-bar-back" onclick="goBack()" aria-label="Back">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        </button>
+        <div class="top-bar-title-wrap">
+          <div class="top-bar-title">Order Detail</div>
+        </div>
+        <button class="top-bar-action" onclick="openFoMore()" aria-label="More">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+        </button>
+      </div>
+
+      <div class="scroll-area">
+        <div id="foDetailBody" class="scroll-content with-footer" style="padding: 0 0 96px;"></div>
+      </div>
+
+      <div class="footer-bar cta-stack" id="foFooter"></div>
+
+      <div class="home-ind"><div class="home-ind-bar"></div></div>
+    </div>
+
+    <!-- ==================== SCREEN 5: RAISE CALL-OFF ==================== -->
+    <div class="screen" id="screen-calloff">
+      <div class="status-bar">
+        <span class="status-time">9:41</span>
+        <span class="status-icons">
+          <svg viewBox="0 0 16 12"><path d="M0 12h2v-3H0v3zm4 0h2V7H4v5zm4 0h2V4H8v8zm4 0h2V0h-2v12z"/></svg>
+          <svg viewBox="0 0 16 12"><path d="M8 2c2.5 0 4.7 1 6.4 2.6l1.4-1.4C13.8 1 11 0 8 0S2.2 1 0 3.2l1.4 1.4C3.3 3 5.5 2 8 2zm0 4c1.4 0 2.6.5 3.5 1.4l1.4-1.4C11.6 4.8 9.9 4 8 4s-3.6.8-4.9 2l1.4 1.4C5.4 6.5 6.6 6 8 6zm0 4c.8 0 1.5.3 2 .9L8 12l-2-1.1c.5-.5 1.2-.9 2-.9z"/></svg>
+          <svg viewBox="0 0 24 12"><rect x="1" y="1" width="20" height="10" rx="2" stroke="currentColor" stroke-width="1" fill="none"/><rect x="3" y="3" width="16" height="6" rx="1" fill="currentColor"/><rect x="22" y="4" width="1.5" height="4" rx="0.5" fill="currentColor"/></svg>
+        </span>
+      </div>
+      <div class="top-bar">
+        <button class="top-bar-back" onclick="goBack()" aria-label="Close">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+        <div class="top-bar-title-wrap">
+          <div class="top-bar-title">New Call-off</div>
+          <div class="top-bar-sub">Auto-approves at or under $500</div>
+        </div>
+      </div>
+
+      <div class="scroll-area">
+        <div class="scroll-content with-footer">
+          <div class="merlin-dropdown">
+            <label class="input-label">Project <span class="required">*</span></label>
+            <div class="input-wrapper">
+              <select id="coProject" onchange="onCoProjectChange()">
+                <option value="" disabled selected>Select a project</option>
+                <option value="kennedy">Kennedy Ranch</option>
+                <option value="maslowski">Maslowski - Maintenance</option>
+                <option value="avk">avk's offsite perth</option>
+              </select>
+              <svg class="suffix-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="merlin-dropdown">
+              <label class="input-label">Serial <span class="required">*</span></label>
+              <div class="input-wrapper">
+                <select id="coSerial" disabled>
+                  <option value="" disabled selected>Select project first</option>
+                </select>
+                <svg class="suffix-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+              </div>
+            </div>
+            <div class="merlin-text-field">
+              <label class="input-label">Need by</label>
+              <div class="input-wrapper">
+                <input type="text" placeholder="MM/DD/YYYY" id="coNeedBy" />
+                <svg class="suffix-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              </div>
+            </div>
+          </div>
+
+          <div class="merlin-text-field">
+            <label class="input-label">Priority</label>
+            <div class="prio-row" id="coPriority">
+              <button type="button" class="prio-opt standard active" data-prio="standard" onclick="setPriority('standard')"><span class="dot"></span>Standard</button>
+              <button type="button" class="prio-opt rush" data-prio="rush" onclick="setPriority('rush')"><span class="dot"></span>Rush</button>
+              <button type="button" class="prio-opt emergency" data-prio="emergency" onclick="setPriority('emergency')"><span class="dot"></span>Emergency</button>
+            </div>
+          </div>
+
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom: 8px;">
+            <span style="font-size: 12px; color: var(--text-sub); font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px;">Line items</span>
+            <span style="font-size: 11px; color: var(--text-soft); font-weight: 500;" id="coLineCount">0 items</span>
+          </div>
+          <div id="coLineItems"></div>
+          <button type="button" class="add-line-btn" onclick="openAddLineSheet()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add item
+          </button>
+
+          <div class="grand-total" style="margin-top: 14px;">
+            <span class="lbl">Total</span>
+            <span class="val" id="coGrandTotal">$0.00</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bar">
+        <button class="btn btn-natural outlined" style="flex:1" onclick="goBack()">Cancel</button>
+        <button class="btn btn-primary" style="flex:1.4" id="coSubmitBtn" onclick="submitCallOff()" disabled>Submit</button>
+      </div>
+
+      <div class="home-ind"><div class="home-ind-bar"></div></div>
+    </div>
+
+    <!-- ==================== SCREEN 6: CONFIRM DELIVERY ==================== -->
+    <div class="screen" id="screen-delivery">
+      <div class="status-bar">
+        <span class="status-time">9:41</span>
+        <span class="status-icons">
+          <svg viewBox="0 0 16 12"><path d="M0 12h2v-3H0v3zm4 0h2V7H4v5zm4 0h2V4H8v8zm4 0h2V0h-2v12z"/></svg>
+          <svg viewBox="0 0 16 12"><path d="M8 2c2.5 0 4.7 1 6.4 2.6l1.4-1.4C13.8 1 11 0 8 0S2.2 1 0 3.2l1.4 1.4C3.3 3 5.5 2 8 2zm0 4c1.4 0 2.6.5 3.5 1.4l1.4-1.4C11.6 4.8 9.9 4 8 4s-3.6.8-4.9 2l1.4 1.4C5.4 6.5 6.6 6 8 6zm0 4c.8 0 1.5.3 2 .9L8 12l-2-1.1c.5-.5 1.2-.9 2-.9z"/></svg>
+          <svg viewBox="0 0 24 12"><rect x="1" y="1" width="20" height="10" rx="2" stroke="currentColor" stroke-width="1" fill="none"/><rect x="3" y="3" width="16" height="6" rx="1" fill="currentColor"/><rect x="22" y="4" width="1.5" height="4" rx="0.5" fill="currentColor"/></svg>
+        </span>
+      </div>
+      <div class="top-bar">
+        <button class="top-bar-back" onclick="goBack()" aria-label="Back">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        </button>
+        <div class="top-bar-title-wrap">
+          <div class="top-bar-title">Confirm Delivery</div>
+          <div class="top-bar-sub" id="cdSub">— · —</div>
+        </div>
+      </div>
+
+      <div class="scroll-area">
+        <div class="scroll-content with-footer" id="deliveryBody"></div>
+      </div>
+
+      <div class="footer-bar">
+        <button class="btn btn-primary btn-block" id="cdConfirmBtn" onclick="submitDelivery()">Confirm Delivery</button>
+      </div>
+
+      <div class="home-ind"><div class="home-ind-bar"></div></div>
+    </div>
+
+    <!-- ==================== SCREEN 7: SHIPMENTS ==================== -->
+    <div class="screen" id="screen-shipments">
+      <div class="status-bar">
+        <span class="status-time">9:41</span>
+        <span class="status-icons">
+          <svg viewBox="0 0 16 12"><path d="M0 12h2v-3H0v3zm4 0h2V7H4v5zm4 0h2V4H8v8zm4 0h2V0h-2v12z"/></svg>
+          <svg viewBox="0 0 16 12"><path d="M8 2c2.5 0 4.7 1 6.4 2.6l1.4-1.4C13.8 1 11 0 8 0S2.2 1 0 3.2l1.4 1.4C3.3 3 5.5 2 8 2zm0 4c1.4 0 2.6.5 3.5 1.4l1.4-1.4C11.6 4.8 9.9 4 8 4s-3.6.8-4.9 2l1.4 1.4C5.4 6.5 6.6 6 8 6zm0 4c.8 0 1.5.3 2 .9L8 12l-2-1.1c.5-.5 1.2-.9 2-.9z"/></svg>
+          <svg viewBox="0 0 24 12"><rect x="1" y="1" width="20" height="10" rx="2" stroke="currentColor" stroke-width="1" fill="none"/><rect x="3" y="3" width="16" height="6" rx="1" fill="currentColor"/><rect x="22" y="4" width="1.5" height="4" rx="0.5" fill="currentColor"/></svg>
+        </span>
+      </div>
+
+      <div class="root-hdr">
+        <button class="root-hdr-back" onclick="exitToApp()" aria-label="Back to app">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        </button>
+        <div class="root-hdr-titles">
+          <div class="root-hdr-title">Shipments</div>
+          <div class="root-hdr-sub" id="shipHdrSub">— shipments</div>
+        </div>
+        <button class="root-hdr-action" aria-label="Filter">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+        </button>
+      </div>
+
+      <div class="scroll-area">
+        <div class="scroll-content with-tabbar" id="shipmentList"></div>
+      </div>
+
+      <div class="bottom-tab-bar">
+        <button class="tab" data-tab="picks" onclick="goTab('picks')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          Picks
+        </button>
+        <button class="tab" data-tab="orders" onclick="goTab('orders')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
+          Orders
+        </button>
+        <button class="tab active" data-tab="shipments" onclick="goTab('shipments')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+          Shipments
+        </button>
+      </div>
+
+      <div class="home-ind"><div class="home-ind-bar"></div></div>
+    </div>
+
+    <!-- ==================== SCRIM + SHEETS ==================== -->
+    <div class="scrim" id="scrim" onclick="closeSheet()"></div>
+
+    <!-- Generic sheet (used for exception flag, shipment detail, FO more menu) -->
+    <div class="sheet" id="sheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-hdr">
+        <div class="sheet-title" id="sheetTitle">Title</div>
+        <button class="sheet-close" onclick="closeSheet()" aria-label="Close">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="sheet-body" id="sheetBody"></div>
+      <div class="sheet-footer" id="sheetFooter" style="display:none;"></div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast">
+      <span class="icon" id="toastIcon">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </span>
+      <span id="toastMsg">Saved</span>
+    </div>
+  </div>
+
+  <script>
+    /* ============================================================
+       MOCK DATA
+       ============================================================ */
+    const MATERIALS = [
+      { id: 'DRY-12-STD', name: '1/2" Drywall 4x12', uom: 'SHT', price: 14.50 },
+      { id: 'PNT-RED-OBV', name: 'Obvious Paint Red', uom: 'GAL', price: 32.00 },
+      { id: 'LMB-2X4X8', name: '2x4x8 Lumber', uom: 'PCS', price: 4.85 },
+      { id: 'SCR-3IN-DW', name: '3" Drywall Screws (5lb)', uom: 'BOX', price: 18.75 },
+      { id: 'JNT-CMP-5G', name: 'Joint Compound 5gal', uom: 'BKT', price: 21.40 },
+      { id: 'TPE-DW-50', name: 'Drywall Tape 500ft', uom: 'ROL', price: 6.20 },
+      { id: 'ANG-CMR-8', name: 'Metal Corner Bead 8ft', uom: 'PCS', price: 3.10 },
+    ];
+
+    const PROJECT_SERIALS = {
+      kennedy: [
+        { id: 's1', name: 'KR-Phase-2-Drywall' },
+        { id: 's2', name: 'KR-Trim-Carpentry' },
+      ],
+      maslowski: [
+        { id: 's3', name: 'MM-Paint-Touchup-2026Q2' },
+        { id: 's4', name: 'MM-General-Maintenance' },
+      ],
+      avk: [
+        { id: 's5', name: 'AVK-Offsite-Build-A' },
+      ],
+    };
+    const PROJECT_NAMES = {
+      kennedy: 'Kennedy Ranch',
+      maslowski: 'Maslowski - Maintenance',
+      avk: "avk's offsite perth",
+    };
+
+    // Mutable mock store
+    const STATE = {
+      fos: [
+        // S3 Today
+        { id: 'FO-1001', project: 'avk', projectName: "avk's offsite perth", status: 'READY', priority: 'STANDARD', items: [
+          { sku: 'DRY-12-STD', name: '1/2" Drywall 4x12', req: 40, picked: 40, packed: 40, delivered: 0 },
+          { sku: 'JNT-CMP-5G', name: 'Joint Compound 5gal', req: 4, picked: 4, packed: 4, delivered: 0 },
+        ], source: 'AD_HOC', createdBy: 'Sneha Kumari', createdAt: 'Today · 06:42', needBy: 'Today', notes: '', isToday: true, activity: [
+          { who: 'Sneha Kumari', when: 'Today, 06:42 AM', kind: 'Created', body: 'Ad-Hoc Call-off created' },
+          { who: 'Anup Kulkarni', when: 'Today, 07:14 AM', kind: 'Status changed', body: 'NEW → IN_PICK' },
+          { who: 'Anup Kulkarni', when: 'Today, 08:55 AM', kind: 'Status changed', body: 'IN_PICK → READY' },
+        ] },
+        { id: 'FO-1002', project: 'avk', projectName: "avk's offsite perth", status: 'IN_TRANSIT', priority: 'STANDARD', items: [
+          { sku: 'LMB-2X4X8', name: '2x4x8 Lumber', req: 60, picked: 60, packed: 60, delivered: 0 },
+        ], source: 'AD_HOC', createdBy: 'Sneha Kumari', createdAt: 'Today · 05:10', needBy: 'Today', notes: '', isToday: true, driver: 'Rakesh Patil', activity: [
+          { who: 'Sneha Kumari', when: 'Today, 05:10 AM', kind: 'Created', body: 'Ad-Hoc Call-off created' },
+          { who: 'Anup Kulkarni', when: 'Today, 06:00 AM', kind: 'Status changed', body: 'NEW → IN_PICK' },
+          { who: 'Anup Kulkarni', when: 'Today, 07:30 AM', kind: 'Status changed', body: 'IN_PICK → READY' },
+          { who: 'Sneha Kumari', when: 'Today, 08:00 AM', kind: 'Driver assigned', body: 'Rakesh Patil' },
+          { who: 'Sneha Kumari', when: 'Today, 08:15 AM', kind: 'Status changed', body: 'READY → IN_TRANSIT' },
+        ] },
+        // S3 All
+        { id: 'FO-1004', project: 'kennedy', projectName: 'Kennedy Ranch', status: 'IN_PICK', priority: 'STANDARD', items: [
+          { sku: 'DRY-12-STD', name: '1/2" Drywall 4x12', req: 100, picked: 0, packed: 0, delivered: 0 },
+        ], source: 'AD_HOC', createdBy: 'Sneha Kumari', createdAt: 'Today · 08:00', needBy: 'Tomorrow', notes: '', isToday: true, picker: 'Anup Kulkarni', pickListId: 'PK-1006', activity: [
+          { who: 'Sneha Kumari', when: 'Today, 08:00 AM', kind: 'Created', body: 'Ad-Hoc Call-off created' },
+          { who: 'Sneha Kumari', when: 'Today, 08:02 AM', kind: 'Status changed', body: 'NEW → IN_PICK' },
+          { who: 'Sneha Kumari', when: 'Today, 08:02 AM', kind: 'Picker assigned', body: 'Anup Kulkarni assigned to PK-1006' },
+        ] },
+        { id: 'FO-1005', project: 'maslowski', projectName: 'Maslowski - Maintenance', status: 'NEW', priority: 'RUSH', items: [
+          { sku: 'PNT-RED-OBV', name: 'Obvious Paint Red', req: 6, picked: 0, packed: 0, delivered: 0 },
+        ], source: 'AD_HOC', createdBy: 'Sneha Kumari', createdAt: 'Today · 09:10', needBy: 'Tomorrow', notes: 'Touch-up after weekend rain.', isToday: true, activity: [
+          { who: 'Sneha Kumari', when: 'Today, 09:10 AM', kind: 'Created', body: 'Ad-Hoc Call-off created' },
+        ] },
+        // History
+        { id: 'FO-1009', project: 'maslowski', projectName: 'Maslowski - Maintenance', status: 'DELIVERED', priority: 'STANDARD', items: [
+          { sku: 'PNT-RED-OBV', name: 'Obvious Paint Red', req: 4, picked: 4, packed: 4, delivered: 4 },
+        ], source: 'AD_HOC', remainderOf: 'FO-1008', createdBy: 'Sneha Kumari', createdAt: 'May 28 · 04:10 PM', needBy: 'May 28', notes: '', isToday: false, driver: 'Rakesh Patil', activity: [
+          { who: 'Sneha Kumari', when: 'May 28, 04:10 PM', kind: 'Created', body: 'Remainder of FO-1008' },
+          { who: 'Sneha Kumari', when: 'May 28, 06:00 PM', kind: 'Status changed', body: 'NEW → IN_PICK' },
+          { who: 'Sneha Kumari', when: 'May 28, 06:00 PM', kind: 'Picker assigned', body: 'Picker Anup Kulkarni assigned to PK-1008' },
+          { who: 'Anup Kulkarni', when: 'May 28, 06:03 PM', kind: 'Status changed', body: 'IN_PICK → READY' },
+          { who: 'Sneha Kumari', when: 'May 28, 06:06 PM', kind: 'Status changed', body: 'READY → IN_TRANSIT' },
+          { who: 'Sneha Kumari', when: 'May 28, 06:07 PM', kind: 'Status changed', body: 'IN_TRANSIT → DELIVERED' },
+        ] },
+        // Pending approval (over $500)
+        { id: 'MR-2031', project: 'kennedy', projectName: 'Kennedy Ranch', status: 'PENDING_APPROVAL', priority: 'STANDARD', items: [
+          { sku: 'DRY-12-STD', name: '1/2" Drywall 4x12', req: 80, picked: 0, packed: 0, delivered: 0 },
+          { sku: 'SCR-3IN-DW', name: '3" Drywall Screws (5lb)', req: 12, picked: 0, packed: 0, delivered: 0 },
+        ], source: 'AD_HOC', createdBy: 'Field Foreman', createdAt: 'Today · 07:55', needBy: 'Tomorrow', notes: 'Above approval threshold ($1,385).', isMR: true, isToday: true, activity: [
+          { who: 'Field Foreman', when: 'Today, 07:55 AM', kind: 'Submitted', body: 'Awaiting PM approval' },
+        ] },
+      ],
+      pickLists: [
+        { id: 'PK-1006', foId: 'FO-1004', project: 'Kennedy Ranch', picker: 'Anup Kulkarni', status: 'ASSIGNED', items: [
+          { sku: 'DRY-12-STD', name: '1/2" Drywall 4x12', location: 'A-12-03', need: 100, picked: 0, flag: null, note: '' },
+        ] },
+        { id: 'PK-1007', foId: 'FO-1003', project: "avk's offsite perth", picker: 'Anup Kulkarni', status: 'IN_PROGRESS', items: [
+          { sku: 'LMB-2X4X8', name: '2x4x8 Lumber', location: 'B-04-11', need: 60, picked: 20, flag: null, note: '' },
+          { sku: 'SCR-3IN-DW', name: '3" Drywall Screws (5lb)', location: 'B-02-09', need: 4, picked: 0, flag: null, note: '' },
+        ] },
+        // Completed
+        { id: 'PK-1003', foId: 'FO-1001', project: "avk's offsite perth", picker: 'Anup Kulkarni', status: 'DONE', items: [
+          { sku: 'DRY-12-STD', name: '1/2" Drywall 4x12', location: 'A-12-03', need: 40, picked: 40, flag: null, note: '' },
+          { sku: 'JNT-CMP-5G', name: 'Joint Compound 5gal', location: 'C-01-04', need: 4, picked: 4, flag: null, note: '' },
+        ] },
+        { id: 'PK-1008', foId: 'FO-1009', project: 'Maslowski - Maintenance', picker: 'Anup Kulkarni', status: 'DONE', items: [
+          { sku: 'PNT-RED-OBV', name: 'Obvious Paint Red', location: 'D-08-02', need: 4, picked: 4, flag: null, note: '' },
+        ] },
+      ],
+      shipments: [
+        { id: 'SH-7012', foId: 'FO-1002', project: "avk's offsite perth", driver: 'Rakesh Patil', status: 'IN_TRANSIT', dispatchedAt: 'Today · 08:15 AM', deliveredAt: null, address: '14 Drive Through Rd, Perth', items: [
+          { sku: 'LMB-2X4X8', name: '2x4x8 Lumber', qty: 60 },
+        ] },
+        { id: 'SH-7010', foId: 'FO-1009', project: 'Maslowski - Maintenance', driver: 'Rakesh Patil', status: 'DELIVERED', dispatchedAt: 'May 28 · 06:06 PM', deliveredAt: 'May 28 · 06:35 PM', address: '24 Maslowski Ln, Hartford', items: [
+          { sku: 'PNT-RED-OBV', name: 'Obvious Paint Red', qty: 4 },
+        ] },
+      ],
+    };
+
+    /* ============================================================
+       NAVIGATION
+       ============================================================ */
+    const navStack = ['picks'];
+    let currentScreen = 'picks';
+
+    function showScreen(name, isBack = false) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      const el = document.getElementById('screen-' + name);
+      if (!el) return;
+      el.classList.add('active');
+      if (!isBack && currentScreen !== name) navStack.push(name);
+      currentScreen = name;
+      // Sync bottom tab active state on root screens
+      ['picks', 'orders', 'shipments'].forEach(r => {
+        const screen = document.getElementById('screen-' + r);
+        if (!screen) return;
+        screen.querySelectorAll('.bottom-tab-bar .tab').forEach(t => {
+          t.classList.toggle('active', t.dataset.tab === name);
+        });
+      });
+      // Re-render on entry for live data
+      if (name === 'picks') renderPicks();
+      if (name === 'orders') renderOrders();
+      if (name === 'shipments') renderShipments();
+    }
+
+    function goBack() {
+      if (navStack.length > 1) {
+        navStack.pop();
+        showScreen(navStack[navStack.length - 1], true);
+      } else {
+        showScreen('orders', true);
+      }
+    }
+
+    function goTab(name) {
+      // Root tabs always reset the stack
+      navStack.length = 0;
+      navStack.push(name);
+      showScreen(name);
+    }
+
+    // Exit Pick & Pack back to the parent app dashboard (prototype-only stub).
+    function exitToApp() {
+      showToast('Back to app dashboard — prototype only', 'info');
+    }
+
+    /* ============================================================
+       SCREEN 1: PICK QUEUE
+       ============================================================ */
+    let pickTab = 'to-pick';
+
+    function setPickTab(t) {
+      pickTab = t;
+      document.querySelectorAll('#pickSeg .seg-opt').forEach(b => {
+        b.classList.toggle('active', b.dataset.tab === t);
+      });
+      renderPicks();
+    }
+
+    function pickProgress(pl) {
+      const totalLines = pl.items.length;
+      const doneLines = pl.items.filter(i => i.picked >= i.need || i.flag).length;
+      const totalQty = pl.items.reduce((s, i) => s + i.need, 0);
+      const pickedQty = pl.items.reduce((s, i) => s + Math.min(i.picked, i.need), 0);
+      return { totalLines, doneLines, totalQty, pickedQty, pct: totalQty ? Math.round(pickedQty / totalQty * 100) : 0 };
+    }
+
+    function renderPicks() {
+      const toPick = STATE.pickLists.filter(p => p.status !== 'DONE');
+      const completed = STATE.pickLists.filter(p => p.status === 'DONE');
+      document.getElementById('cntToPick').textContent = toPick.length;
+      document.getElementById('cntCompleted').textContent = completed.length;
+      document.getElementById('picksHdrSub').textContent =
+        (pickTab === 'to-pick'
+          ? `${toPick.length} pick list${toPick.length !== 1 ? 's' : ''} waiting`
+          : `${completed.length} completed`);
+      const list = pickTab === 'to-pick' ? toPick : completed;
+      const root = document.getElementById('pickList');
+      if (!list.length) {
+        root.innerHTML = emptyState('picks',
+          pickTab === 'to-pick' ? 'Nothing in your pick queue' : 'No completed picks yet',
+          pickTab === 'to-pick' ? 'New pick lists will appear here when a fulfillment order moves to In Pick.' : 'Complete a pick list and it will show up here.');
+        return;
+      }
+      root.innerHTML = list.map(pl => {
+        const fo = STATE.fos.find(f => f.id === pl.foId);
+        const prio = fo ? fo.priority : 'STANDARD';
+        const p = pickProgress(pl);
+        const statusPill = pl.status === 'DONE'
+          ? `<span class="status-pill green"><span class="dot"></span>DONE</span>`
+          : pl.status === 'IN_PROGRESS'
+            ? `<span class="status-pill blue"><span class="dot"></span>IN PROGRESS</span>`
+            : `<span class="status-pill gray"><span class="dot"></span>ASSIGNED</span>`;
+        const footerLine = pickTab === 'completed'
+          ? `<div class="card-meta">
+               <span><b style="color: var(--text-strong); font-weight: 600;">${p.pickedQty} / ${p.totalQty}</b> qty · ${p.totalLines} line${p.totalLines !== 1 ? 's' : ''}</span>
+               <span style="color: var(--success-dark); font-weight: 600;">
+                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -1px;"><polyline points="20 6 9 17 4 12"/></svg>
+                 Picked
+               </span>
+             </div>`
+          : `<div class="card-meta">
+               <span><b style="color: var(--text-strong); font-weight: 600;">${p.totalLines}</b> line${p.totalLines !== 1 ? 's' : ''} · <b style="color: var(--text-strong); font-weight: 600;">${p.totalQty}</b> qty to pick</span>
+               <span style="color: var(--text-soft);">${fo && fo.needBy ? 'Need by ' + fo.needBy : ''}</span>
+             </div>`;
+        return `
+          <div class="card" onclick="openPickList('${pl.id}')">
+            <div class="card-row1">
+              <span class="card-id">${pl.id}</span>
+              <span class="prio-chip ${prio.toLowerCase()}">${titleCase(prio)}</span>
+              <span style="flex:1"></span>
+              ${statusPill}
+            </div>
+            <div class="card-project">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+              ${pl.project}
+            </div>
+            <div class="card-meta" style="border: none; padding-top: 0; margin-top: 2px;">
+              <span>FO ${pl.foId} · ${pl.picker}</span>
+            </div>
+            ${footerLine}
+          </div>`;
+      }).join('');
+    }
+
+    /* ============================================================
+       SCREEN 2: ACTIVE PICK LIST
+       ============================================================ */
+    let activePickId = null;
+
+    function openPickList(id) {
+      activePickId = id;
+      renderPickDetail();
+      showScreen('pick-detail');
+    }
+
+    function renderPickDetail() {
+      const pl = STATE.pickLists.find(p => p.id === activePickId);
+      if (!pl) return;
+      const fo = STATE.fos.find(f => f.id === pl.foId);
+      document.getElementById('pdTitle').textContent = pl.id;
+      document.getElementById('pdSub').textContent = `Linked to ${pl.foId}`;
+      const p = pickProgress(pl);
+
+      const meta = `
+        <div class="items-table">
+          <div class="items-table-hdr">
+            <div>
+              <div class="items-table-title">${pl.project}</div>
+              <div class="items-table-sub">FO ${pl.foId} · ${titleCase(fo ? fo.priority : 'STANDARD')}</div>
+            </div>
+            <span class="status-pill ${pl.status === 'DONE' ? 'green' : pl.status === 'IN_PROGRESS' ? 'blue' : 'gray'}">
+              <span class="dot"></span>${pl.status === 'IN_PROGRESS' ? 'IN PROGRESS' : pl.status}
+            </span>
+          </div>
+          <div style="padding: 12px 14px;">
+            <div class="kv-grid">
+              <span class="k">Picker</span><span class="v">${pl.picker}</span>
+              <span class="k">Job location</span><span class="v">${fo && fo.driver ? fo.driver : '—'}</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="padding: 12px 14px; background: var(--bg-weak); border-radius: 10px; margin-bottom: 12px;">
+          <div class="progress">
+            <span class="progress-text" style="font-size: 12px;">${p.doneLines} of ${p.totalLines} items picked</span>
+            <span class="progress-pct" style="font-size: 12px;">${p.pickedQty} / ${p.totalQty} qty</span>
+          </div>
+          <div class="progress-bar" style="margin-top: 6px; height: 6px;"><div class="progress-fill ${p.pct < 100 ? 'warning' : ''}" style="width: ${p.pct}%;"></div></div>
+        </div>
+
+        <div class="items-table">
+          <div class="items-table-hdr">
+            <div class="items-table-title">Line items</div>
+            <span class="items-table-sub">${pl.items.length} line${pl.items.length !== 1 ? 's' : ''}</span>
+          </div>
+          ${pl.items.map((it, idx) => renderPickLine(it, idx, pl.status === 'DONE')).join('')}
+        </div>
+      `;
+      document.getElementById('pickDetailBody').innerHTML = meta;
+
+      // Footer state
+      const footer = document.getElementById('pickFooter');
+      const allPicked = pl.items.every(i => i.picked >= i.need && !i.flag);
+      const anyPicked = pl.items.some(i => i.picked > 0 || i.flag);
+      if (pl.status === 'DONE') {
+        footer.style.display = 'none';
+      } else {
+        footer.style.display = 'flex';
+        document.getElementById('pdCompleteBtn').disabled = !allPicked;
+      }
+    }
+
+    function renderPickLine(it, idx, readOnly) {
+      const isDone = it.picked >= it.need && !it.flag;
+      const isFlagged = !!it.flag;
+      // In read-only mode, don't tint each line green — the DONE status pill and
+      // full progress bar at top already convey completion; per-line green is noise.
+      const cls = readOnly ? (isFlagged ? 'flagged' : '') : (isDone ? 'done' : isFlagged ? 'flagged' : '');
+      const actions = readOnly
+        ? `
+          <div class="pl-actions pl-actions-ro">
+            <div class="pl-ro-summary">
+              <span class="pl-ro-label">Picked</span>
+              <span class="pl-ro-value">${it.picked} <span class="pl-ro-of">/ ${it.need}</span></span>
+            </div>
+            ${isFlagged
+              ? `<span class="pl-ro-flag"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>${it.flag}${it.flagQty ? ` · ${it.flagQty}` : ''}</span>`
+              : `<span class="pl-ro-check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>`}
+          </div>`
+        : `
+          <div class="pl-actions">
+            <div class="qty-stepper">
+              <button onclick="adjustPickQty(${idx}, -1)" ${it.picked === 0 ? 'disabled' : ''}>−</button>
+              <input type="number" value="${it.picked}" min="0" max="${it.need}" onchange="setPickQty(${idx}, this.value)" />
+              <button onclick="adjustPickQty(${idx}, +1)" ${it.picked >= it.need ? 'disabled' : ''}>+</button>
+            </div>
+            <button class="pl-flag-btn ${isFlagged ? 'active' : ''}" onclick="openExceptionSheet(${idx})">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+              ${isFlagged ? `${it.flag}${it.flagQty ? ` · ${it.flagQty}` : ''}` : 'Flag'}
+            </button>
+          </div>`;
+      return `
+        <div class="pick-line ${cls}">
+          <div class="pl-head">
+            <span class="pl-num">${idx + 1}</span>
+            <div class="pl-info">
+              <div class="pl-name">${it.name}</div>
+              <div class="pl-sku">SKU ${it.sku}</div>
+              <div class="pl-meta">
+                <span>Location: <strong>${it.location || '—'}</strong></span>
+                <span>Need: <strong>${it.need}</strong></span>
+              </div>
+            </div>
+          </div>
+          ${actions}
+          ${isFlagged && it.note ? `<div class="pl-exception-note"><b>${it.flag}</b> · ${it.note}</div>` : ''}
+        </div>
+      `;
+    }
+
+    function adjustPickQty(idx, delta) {
+      const pl = STATE.pickLists.find(p => p.id === activePickId);
+      const it = pl.items[idx];
+      it.picked = Math.max(0, Math.min(it.need, it.picked + delta));
+      if (it.picked > 0 && pl.status === 'ASSIGNED') pl.status = 'IN_PROGRESS';
+      renderPickDetail();
+    }
+    function setPickQty(idx, val) {
+      const pl = STATE.pickLists.find(p => p.id === activePickId);
+      const it = pl.items[idx];
+      const n = Math.max(0, Math.min(it.need, parseInt(val || '0', 10)));
+      it.picked = isNaN(n) ? 0 : n;
+      if (it.picked > 0 && pl.status === 'ASSIGNED') pl.status = 'IN_PROGRESS';
+      renderPickDetail();
+    }
+
+    function openExceptionSheet(idx) {
+      const pl = STATE.pickLists.find(p => p.id === activePickId);
+      const it = pl.items[idx];
+      const types = ['Damaged', 'Missing', 'Wrong Item', 'Short'];
+      tmpExType = it.flag || null;
+      const remaining = Math.max(1, it.need - (it.picked || 0));
+      tmpExQty = (typeof it.flagQty === 'number' && it.flagQty > 0) ? it.flagQty : remaining;
+      const body = `
+        <p style="font-size: 12px; color: var(--text-sub); margin-bottom: 12px;">
+          ${it.name} (SKU ${it.sku}) · Need <b style="color:var(--text-strong);">${it.need}</b> · Picked <b style="color:var(--text-strong);">${it.picked || 0}</b>
+        </p>
+        <div style="font-size: 12px; color: var(--text-sub); font-weight: 600; margin-bottom: 6px;">Exception type</div>
+        <div class="chip-grid" id="exTypeGrid">
+          ${types.map(t => `<button class="chip-opt ${tmpExType === t ? 'active' : ''}" data-type="${t}" onclick="setExType('${t}')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            ${t}
+          </button>`).join('')}
+        </div>
+        <div class="merlin-text-field" style="margin-bottom: 12px;">
+          <label class="input-label">Problem quantity <span class="required">*</span></label>
+          <div class="qty-stepper" id="exQtyStepper" style="width:100%;">
+            <button type="button" onclick="adjustExQty(-1)">−</button>
+            <input type="number" id="exQty" value="${tmpExQty}" min="1" max="${it.need}" onchange="setExQty(this.value, ${it.need})" />
+            <button type="button" onclick="adjustExQty(1, ${it.need})">+</button>
+          </div>
+          <div class="hint-text" style="margin-top:6px;">How many units have this issue (damaged, missing, wrong, short).</div>
+        </div>
+        <div class="merlin-text-field" style="margin-bottom: 0;">
+          <label class="input-label">Note <span class="optional">optional</span></label>
+          <div class="input-wrapper multiline">
+            <textarea id="exNote" placeholder="Add detail (e.g. 'pallet wrap torn, 6 sheets cracked')">${it.note || ''}</textarea>
+          </div>
+        </div>
+      `;
+      openSheet('Flag exception', body, [
+        { label: 'Clear', cls: 'btn-natural outlined', onClick: `clearException(${idx})` },
+        { label: 'Save', cls: 'btn-primary', onClick: `saveException(${idx})` },
+      ]);
+    }
+
+    let tmpExType = null;
+    let tmpExQty = 0;
+    function setExType(t) {
+      tmpExType = t;
+      document.querySelectorAll('#exTypeGrid .chip-opt').forEach(c => {
+        c.classList.toggle('active', c.dataset.type === t);
+      });
+    }
+    function setExQty(val, max) {
+      const n = Math.max(1, Math.min(max, parseInt(val || '0', 10)));
+      tmpExQty = isNaN(n) ? 1 : n;
+      document.getElementById('exQty').value = tmpExQty;
+    }
+    function adjustExQty(delta, max) {
+      const cap = (typeof max === 'number') ? max : Infinity;
+      tmpExQty = Math.max(1, Math.min(cap, tmpExQty + delta));
+      document.getElementById('exQty').value = tmpExQty;
+    }
+    function saveException(idx) {
+      const pl = STATE.pickLists.find(p => p.id === activePickId);
+      const it = pl.items[idx];
+      if (!tmpExType) { showToast('Pick an exception type', 'warning'); return; }
+      if (!tmpExQty || tmpExQty < 1) { showToast('Enter problem quantity', 'warning'); return; }
+      it.flag = tmpExType;
+      it.flagQty = tmpExQty;
+      it.note = document.getElementById('exNote').value.trim();
+      if (pl.status === 'ASSIGNED') pl.status = 'IN_PROGRESS';
+      tmpExType = null; tmpExQty = 0;
+      closeSheet();
+      renderPickDetail();
+      showToast('Exception flagged', 'warning');
+    }
+    function clearException(idx) {
+      const pl = STATE.pickLists.find(p => p.id === activePickId);
+      pl.items[idx].flag = null;
+      pl.items[idx].flagQty = 0;
+      pl.items[idx].note = '';
+      tmpExType = null;
+      closeSheet();
+      renderPickDetail();
+    }
+
+    function confirmPick(kind) {
+      const pl = STATE.pickLists.find(p => p.id === activePickId);
+      if (!pl) return;
+      pl.status = 'DONE';
+      const fo = STATE.fos.find(f => f.id === pl.foId);
+      if (fo) {
+        // Move FO from IN_PICK → READY (or shortage state if partial)
+        pl.items.forEach(it => {
+          const foItem = fo.items.find(x => x.sku === it.sku);
+          if (foItem) {
+            foItem.picked = it.picked;
+            foItem.packed = it.picked;
+          }
+        });
+        fo.status = kind === 'partial' ? 'READY' : 'READY';
+        fo.activity.push({ who: pl.picker, when: 'Today, ' + nowTime(), kind: 'Status changed', body: 'IN_PICK → READY' });
+        if (kind === 'partial') {
+          fo.activity.push({ who: pl.picker, when: 'Today, ' + nowTime(), kind: 'Pick partial', body: 'Remainder of FO created' });
+        }
+      }
+      showToast(kind === 'partial' ? 'Pick partial saved · remainder FO created' : 'Pick complete');
+      goBack();
+    }
+
+    /* ============================================================
+       SCREEN 3: ORDERS DASHBOARD
+       ============================================================ */
+    let orderTab = 'approval';
+
+    function setOrderTab(t) {
+      orderTab = t;
+      document.querySelectorAll('#orderSeg .seg-opt').forEach(b => {
+        b.classList.toggle('active', b.dataset.tab === t);
+      });
+      renderOrders();
+    }
+
+    function statusPillFor(status) {
+      const map = {
+        'NEW': ['gray', 'New'],
+        'IN_PICK': ['blue', 'In Pick'],
+        'READY': ['green', 'Ready to Dispatch'],
+        'IN_TRANSIT': ['feature', 'In Transit'],
+        'DELIVERED': ['green', 'Delivered'],
+        'PENDING_APPROVAL': ['orange', 'Pending Approval'],
+        'CANCELLED': ['red', 'Cancelled'],
+        'HELD': ['orange', 'On Hold'],
+      };
+      const [color, label] = map[status] || ['gray', status];
+      return `<span class="status-pill ${color}"><span class="dot"></span>${label}</span>`;
+    }
+
+    function renderOrders() {
+      let list;
+      if (orderTab === 'approval') {
+        list = STATE.fos.filter(f => f.status === 'PENDING_APPROVAL');
+      } else if (orderTab === 'today') {
+        list = STATE.fos.filter(f => f.isToday && f.status !== 'PENDING_APPROVAL');
+      } else {
+        list = STATE.fos.filter(f => f.status !== 'PENDING_APPROVAL');
+      }
+      const root = document.getElementById('orderList');
+      if (!list.length) {
+        root.innerHTML = emptyState('orders',
+          orderTab === 'approval' ? 'Nothing waiting on you' : 'No orders here yet',
+          orderTab === 'approval' ? 'When a request goes above your auto-approval threshold it will land here.' : 'Tap “+ Raise Call-off” to start a new fulfillment order.');
+        return;
+      }
+      root.innerHTML = list.map(fo => renderFoCard(fo)).join('');
+    }
+
+    function totalItemCount(fo) {
+      return fo.items.reduce((s, i) => s + 1, 0);
+    }
+
+    function renderFoCard(fo) {
+      const isMR = fo.status === 'PENDING_APPROVAL';
+      return `
+        <div class="card" onclick="openFo('${fo.id}')">
+          <div class="card-row1">
+            <span class="card-id">${fo.id}</span>
+            ${statusPillFor(fo.status)}
+            <span class="prio-chip ${fo.priority.toLowerCase()}">${titleCase(fo.priority)}</span>
+          </div>
+          <div class="card-project">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+            ${fo.projectName}
+          </div>
+          ${fo.remainderOf ? `<div style="margin-top: 4px;"><span class="remainder-badge">↪ Remainder of ${fo.remainderOf}</span></div>` : ''}
+          <div class="card-meta">
+            <span>${totalItemCount(fo)} line${totalItemCount(fo) !== 1 ? 's' : ''} · need by <b style="color: var(--text-sub);">${fo.needBy}</b></span>
+            <span>${fo.createdAt}</span>
+          </div>
+          ${isMR ? `
+            <div class="card-actions" onclick="event.stopPropagation();">
+              <button class="btn btn-natural outlined" onclick="event.stopPropagation(); rejectMr('${fo.id}')">Reject</button>
+              <button class="btn btn-primary" onclick="event.stopPropagation(); approveMr('${fo.id}')">Approve</button>
+            </div>
+          ` : ''}
+        </div>
+      `;
+    }
+
+    function approveMr(id) {
+      const fo = STATE.fos.find(f => f.id === id);
+      if (!fo) return;
+      fo.status = 'NEW';
+      fo.isMR = false;
+      const newId = 'FO-' + (1010 + Math.floor(Math.random() * 90));
+      fo.id = newId;
+      fo.activity.push({ who: 'You', when: 'Today, ' + nowTime(), kind: 'Approved', body: 'MR approved → converted to ' + newId });
+      showToast(`Approved → ${newId}`);
+      renderOrders();
+    }
+    function rejectMr(id) {
+      const fo = STATE.fos.find(f => f.id === id);
+      if (!fo) return;
+      fo.status = 'CANCELLED';
+      fo.activity.push({ who: 'You', when: 'Today, ' + nowTime(), kind: 'Rejected', body: 'MR rejected' });
+      showToast('Request rejected', 'warning');
+      renderOrders();
+    }
+
+    /* ============================================================
+       SCREEN 4: FO DETAILS
+       ============================================================ */
+    let activeFoId = null;
+
+    function openFo(id) {
+      activeFoId = id;
+      renderFoDetail();
+      showScreen('fo-detail');
+    }
+
+    function renderFoDetail() {
+      const fo = STATE.fos.find(f => f.id === activeFoId);
+      if (!fo) return;
+
+      const header = `
+        <div class="detail-hdr">
+          <div class="detail-hdr-row">
+            <span class="detail-hdr-id">${fo.id}</span>
+            ${statusPillFor(fo.status)}
+            <span class="prio-chip ${fo.priority.toLowerCase()}">${titleCase(fo.priority)}</span>
+          </div>
+          <div class="detail-hdr-project">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+            ${fo.projectName}
+          </div>
+          ${fo.remainderOf ? `<div class="detail-hdr-remainder"><span class="remainder-badge">↪ Remainder of ${fo.remainderOf}</span></div>` : ''}
+        </div>
+      `;
+
+      const totalQty = fo.items.reduce((s, i) => s + i.req, 0);
+      const itemsBlock = `
+        <div style="padding: 0 20px;">
+          <div class="items-table">
+            <div class="items-table-hdr">
+              <div class="items-table-title">Items <span style="color: var(--text-soft); font-weight: 500;">(${fo.items.length})</span></div>
+              <div class="items-table-sub">${totalQty} total qty</div>
+            </div>
+            ${fo.items.map(it => `
+              <div class="item-row">
+                <div class="item-head">
+                  <div style="flex:1;">
+                    <div class="item-name">${it.name}</div>
+                    <div class="item-sku">SKU ${it.sku}</div>
+                  </div>
+                </div>
+                <div class="item-qty-grid">
+                  <div class="item-qty-cell"><div class="item-qty-label">Req</div><div class="item-qty-val">${it.req}</div></div>
+                  <div class="item-qty-cell"><div class="item-qty-label">Picked</div><div class="item-qty-val ${it.picked === 0 ? 'pending' : ''}">${it.picked}</div></div>
+                  <div class="item-qty-cell"><div class="item-qty-label">Packed</div><div class="item-qty-val ${it.packed === 0 ? 'pending' : ''}">${it.packed}</div></div>
+                  <div class="item-qty-cell"><div class="item-qty-label">Delivered</div><div class="item-qty-val ${it.delivered === 0 ? 'pending' : ''}">${it.delivered}</div></div>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+
+      const detailsBlock = `
+        <div style="padding: 0 20px;">
+          <div class="section" id="detSect">
+            <div class="section-hdr" onclick="toggleSection('detSect')">
+              <div class="sh-left">
+                <span class="sh-icon purple">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                </span>
+                <span class="sh-title">Details</span>
+              </div>
+              <div class="sh-right">
+                <span class="sh-meta">Source ${fo.source || 'AD_HOC'}</span>
+                <svg class="sh-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+              </div>
+            </div>
+            <div class="section-body">
+              <div class="kv-grid">
+                <span class="k">Created by</span><span class="v">${fo.createdBy}</span>
+                <span class="k">Created at</span><span class="v">${fo.createdAt}</span>
+                <span class="k">Need by</span><span class="v">${fo.needBy}</span>
+                <span class="k">Picker</span><span class="v">${fo.picker || '—'}</span>
+                <span class="k">Driver</span><span class="v">${fo.driver || '—'}</span>
+                ${fo.notes ? `<span class="k">Notes</span><span class="v">${fo.notes}</span>` : ''}
+              </div>
+            </div>
+          </div>
+
+          <div class="section" id="actSect">
+            <div class="section-hdr" onclick="toggleSection('actSect')">
+              <div class="sh-left">
+                <span class="sh-icon blue">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                </span>
+                <span class="sh-title">Activity</span>
+              </div>
+              <div class="sh-right">
+                <span class="sh-meta">${fo.activity.length} entries</span>
+                <svg class="sh-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+              </div>
+            </div>
+            <div class="section-body">
+              <div class="activity">
+                ${fo.activity.slice().reverse().map(a => `
+                  <div class="act-item">
+                    <span class="act-dot"></span>
+                    <span class="act-line"></span>
+                    <div class="act-body">
+                      <div class="act-meta"><b>${a.who}</b> · ${a.when} · ${a.kind}</div>
+                      <div class="act-title">${a.body}</div>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('foDetailBody').innerHTML = header + itemsBlock + detailsBlock;
+
+      // Footer CTA based on status
+      const footer = document.getElementById('foFooter');
+      const ctas = ctaForStatus(fo);
+      footer.innerHTML = ctas;
+    }
+
+    function ctaForStatus(fo) {
+      const wrap = (html) => `<div style="width:100%; display:flex; gap:8px;">${html}</div>`;
+      switch (fo.status) {
+        case 'PENDING_APPROVAL':
+          return wrap(`
+            <button class="btn btn-natural outlined" style="flex:1" onclick="rejectMr('${fo.id}'); goBack();">Reject</button>
+            <button class="btn btn-primary" style="flex:1.4" onclick="approveMr('${fo.id}'); renderFoDetail();">Approve</button>
+          `);
+        case 'NEW':
+          return wrap(`<button class="btn btn-primary btn-block" onclick="moveToPick()">Move to Pick</button>`);
+        case 'IN_PICK':
+          return wrap(`<button class="btn btn-primary btn-block" onclick="openLinkedPick()">Open Pick List</button>`);
+        case 'READY':
+          return wrap(`<button class="btn btn-primary btn-block" onclick="markDispatched()">Mark as Dispatched</button>`);
+        case 'IN_TRANSIT':
+          return wrap(`<button class="btn btn-primary btn-block" onclick="openConfirmDelivery()">Confirm Delivery</button>`);
+        case 'DELIVERED':
+          return wrap(`<button class="btn btn-natural outlined btn-block" onclick="goBack()">Done</button>`);
+        case 'CANCELLED':
+          return wrap(`<button class="btn btn-natural outlined btn-block" disabled>Cancelled</button>`);
+        default:
+          return '';
+      }
+    }
+
+    function moveToPick() {
+      const fo = STATE.fos.find(f => f.id === activeFoId);
+      fo.status = 'IN_PICK';
+      // Create a pick list
+      const newPick = {
+        id: 'PK-' + (1010 + Math.floor(Math.random() * 90)),
+        foId: fo.id,
+        project: fo.projectName,
+        picker: 'Anup Kulkarni',
+        status: 'ASSIGNED',
+        items: fo.items.map(it => ({ sku: it.sku, name: it.name, location: '—', need: it.req, picked: 0, flag: null, note: '' })),
+      };
+      STATE.pickLists.push(newPick);
+      fo.pickListId = newPick.id;
+      fo.picker = 'Anup Kulkarni';
+      fo.activity.push({ who: 'You', when: 'Today, ' + nowTime(), kind: 'Status changed', body: 'NEW → IN_PICK' });
+      fo.activity.push({ who: 'You', when: 'Today, ' + nowTime(), kind: 'Picker assigned', body: `Picker Anup Kulkarni assigned to ${newPick.id}` });
+      showToast('Moved to Pick · ' + newPick.id + ' created');
+      renderFoDetail();
+    }
+
+    function openLinkedPick() {
+      const fo = STATE.fos.find(f => f.id === activeFoId);
+      const pl = STATE.pickLists.find(p => p.foId === fo.id && p.status !== 'DONE');
+      if (pl) {
+        activePickId = pl.id;
+        renderPickDetail();
+        showScreen('pick-detail');
+      } else {
+        showToast('No active pick list', 'warning');
+      }
+    }
+
+    function markDispatched() {
+      const fo = STATE.fos.find(f => f.id === activeFoId);
+      fo.status = 'IN_TRANSIT';
+      fo.driver = fo.driver || 'Rakesh Patil';
+      const shipment = {
+        id: 'SH-' + (7020 + Math.floor(Math.random() * 80)),
+        foId: fo.id,
+        project: fo.projectName,
+        driver: fo.driver,
+        status: 'IN_TRANSIT',
+        dispatchedAt: 'Today · ' + nowTime(),
+        deliveredAt: null,
+        address: 'Site address on file',
+        items: fo.items.map(it => ({ sku: it.sku, name: it.name, qty: it.packed || it.picked || it.req })),
+      };
+      STATE.shipments.unshift(shipment);
+      fo.shipmentId = shipment.id;
+      fo.activity.push({ who: 'You', when: 'Today, ' + nowTime(), kind: 'Status changed', body: 'READY → IN_TRANSIT' });
+      showToast(`Dispatched · ${shipment.id} created`);
+      renderFoDetail();
+    }
+
+    function openConfirmDelivery() {
+      const fo = STATE.fos.find(f => f.id === activeFoId);
+      activeShipmentForDelivery = STATE.shipments.find(s => s.foId === fo.id) || STATE.shipments[0];
+      renderDelivery();
+      showScreen('delivery');
+    }
+
+    function openFoMore() {
+      const fo = STATE.fos.find(f => f.id === activeFoId);
+      const canAssign = fo.status === 'NEW';
+      const rows = [];
+      if (canAssign) {
+        rows.push(moreItem('Assign picker', fo.picker || 'Not assigned', 'user'));
+        rows.push(moreItem('Assign driver', fo.driver || 'Not assigned', 'truck'));
+      }
+      rows.push(moreItem('Hold order', '', 'pause'));
+      rows.push(moreItem('Cancel order', '', 'x', 'error'));
+      const body = `
+        <div style="display:flex; flex-direction:column; gap:0;">
+          ${rows.join('')}
+        </div>
+      `;
+      openSheet('Order actions', body, []);
+    }
+    function moreItem(label, sub, icon, variant) {
+      const color = variant === 'error' ? 'var(--error-base)' : 'var(--text-strong)';
+      return `
+        <button style="display:flex; align-items:center; justify-content:space-between; padding:14px 0; background:none; border:none; border-bottom: 1px solid var(--stroke-soft); cursor:pointer; width:100%; text-align:left;" onclick="showToast('${label} · prototype'); closeSheet();">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span style="font-size:14px; font-weight:500; color:${color};">${label}</span>
+          </div>
+          ${sub ? `<span style="font-size:12px; color: var(--text-sub);">${sub}</span>` : ''}
+        </button>
+      `;
+    }
+
+    /* ============================================================
+       SCREEN 5: RAISE CALL-OFF
+       ============================================================ */
+    let coLineItems = [];
+    let coPriority = 'standard';
+
+    function openCallOff() {
+      // Reset
+      coLineItems = [];
+      coPriority = 'standard';
+      document.getElementById('coProject').value = '';
+      document.getElementById('coSerial').innerHTML = '<option value="" disabled selected>Select project first</option>';
+      document.getElementById('coSerial').disabled = true;
+      document.getElementById('coNeedBy').value = '';
+      document.querySelectorAll('#coPriority .prio-opt').forEach(b => b.classList.toggle('active', b.dataset.prio === 'standard'));
+      renderLineItems();
+      showScreen('calloff');
+    }
+
+    function onCoProjectChange() {
+      const p = document.getElementById('coProject').value;
+      const sel = document.getElementById('coSerial');
+      if (!p) { sel.disabled = true; sel.innerHTML = '<option value="" disabled selected>Select project first</option>'; return; }
+      sel.disabled = false;
+      sel.innerHTML = '<option value="" disabled selected>Select a serial</option>' +
+        PROJECT_SERIALS[p].map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+      updateCoSubmit();
+    }
+
+    function setPriority(p) {
+      coPriority = p;
+      document.querySelectorAll('#coPriority .prio-opt').forEach(b => b.classList.toggle('active', b.dataset.prio === p));
+    }
+
+    function removeLineItem(idx) {
+      coLineItems.splice(idx, 1);
+      renderLineItems();
+    }
+
+    function renderLineItems() {
+      const root = document.getElementById('coLineItems');
+      if (!coLineItems.length) {
+        root.innerHTML = `
+          <div class="li-empty">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41L13.42 20.58a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+            <div class="li-empty-t">No items added yet</div>
+            <div class="li-empty-s">Tap “Add item” below to pick a material and quantity.</div>
+          </div>`;
+      } else {
+        root.innerHTML = coLineItems.map((li, idx) => {
+          const mat = MATERIALS.find(m => m.id === li.matId);
+          const total = (li.qty * li.price);
+          return `
+            <div class="lineitem-ro">
+              <div class="liro-top">
+                <div class="liro-name">
+                  <span class="liro-idx">${idx + 1}</span>
+                  <div>
+                    <div class="liro-mat">${mat ? mat.name : '—'}</div>
+                    <div class="liro-sku">SKU ${li.matId}</div>
+                  </div>
+                </div>
+                <button class="li-remove" onclick="removeLineItem(${idx})" aria-label="Remove">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+              </div>
+              <div class="liro-grid">
+                <div class="liro-cell"><span class="liro-k">Qty</span><span class="liro-v">${li.qty} <small>${mat ? mat.uom : ''}</small></span></div>
+                <div class="liro-cell"><span class="liro-k">Price / unit</span><span class="liro-v">$${(li.price || 0).toFixed(2)}</span></div>
+                <div class="liro-cell liro-cell-total"><span class="liro-k">Total</span><span class="liro-v">$${total.toFixed(2)}</span></div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+      document.getElementById('coLineCount').textContent =
+        coLineItems.length + ' item' + (coLineItems.length === 1 ? '' : 's');
+      const grand = coLineItems.reduce((s, li) => s + li.qty * li.price, 0);
+      document.getElementById('coGrandTotal').textContent = '$' + grand.toFixed(2);
+      updateCoSubmit();
+    }
+
+    function updateCoSubmit() {
+      const proj = document.getElementById('coProject').value;
+      const serial = document.getElementById('coSerial').value;
+      const valid = proj && serial && coLineItems.some(li => li.matId && li.qty > 0);
+      document.getElementById('coSubmitBtn').disabled = !valid;
+    }
+
+    /* Add line item bottom sheet */
+    let tmpLi = { matId: '', qty: 1, price: 0 };
+    function openAddLineSheet() {
+      tmpLi = { matId: '', qty: 1, price: 0 };
+      const body = `
+        <div class="merlin-dropdown" style="margin-bottom: 14px;">
+          <label class="input-label">Material <span class="required">*</span></label>
+          <div class="input-wrapper">
+            <svg class="prefix-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <select id="liMat" onchange="onLiMatChange(this.value)">
+              <option value="" disabled selected>Search material…</option>
+              ${MATERIALS.map(m => `<option value="${m.id}">${m.name}</option>`).join('')}
+            </select>
+            <svg class="suffix-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+        </div>
+        <div class="form-row" style="margin-bottom: 14px;">
+          <div class="merlin-text-field" style="margin-bottom: 0;">
+            <label class="input-label">UoM</label>
+            <div class="li-uom" id="liUom" style="height: 44px;">—</div>
+          </div>
+          <div class="merlin-text-field" style="margin-bottom: 0;">
+            <label class="input-label">Quantity <span class="required">*</span></label>
+            <div class="qty-stepper" style="width:100%;">
+              <button type="button" onclick="adjustLiQty(-1)">−</button>
+              <input type="number" id="liQty" value="${tmpLi.qty}" min="0" onchange="setLiQty(this.value)" />
+              <button type="button" onclick="adjustLiQty(1)">+</button>
+            </div>
+          </div>
+        </div>
+        <div class="merlin-text-field" style="margin-bottom: 0;">
+          <label class="input-label">Price / unit</label>
+          <div class="input-wrapper">
+            <span class="prefix-icon" style="font-weight:600; color: var(--text-sub); display:flex; align-items:center; justify-content:center; width:20px; height:20px;">$</span>
+            <input type="number" id="liPrice" min="0" step="0.01" value="0.00" onchange="setLiPrice(this.value)" />
+          </div>
+        </div>
+      `;
+      openSheet('Add item', body, [
+        { label: 'Cancel', cls: 'btn-natural outlined', onClick: 'closeSheet()' },
+        { label: 'Add item', cls: 'btn-primary', onClick: 'saveLineItem()' },
+      ]);
+    }
+    function onLiMatChange(val) {
+      tmpLi.matId = val;
+      const mat = MATERIALS.find(m => m.id === val);
+      if (mat) {
+        tmpLi.price = mat.price;
+        document.getElementById('liUom').textContent = mat.uom;
+        document.getElementById('liPrice').value = mat.price.toFixed(2);
+      }
+    }
+    function setLiQty(val) {
+      const n = Math.max(0, parseFloat(val) || 0);
+      tmpLi.qty = n;
+      document.getElementById('liQty').value = n;
+    }
+    function adjustLiQty(delta) {
+      tmpLi.qty = Math.max(0, (tmpLi.qty || 0) + delta);
+      document.getElementById('liQty').value = tmpLi.qty;
+    }
+    function setLiPrice(val) {
+      tmpLi.price = Math.max(0, parseFloat(val) || 0);
+    }
+    function saveLineItem() {
+      if (!tmpLi.matId || !tmpLi.qty) { showToast('Pick a material and qty', 'warning'); return; }
+      coLineItems.push({ matId: tmpLi.matId, qty: tmpLi.qty, price: tmpLi.price });
+      closeSheet();
+      renderLineItems();
+      showToast('Item added', 'success');
+    }
+
+    function submitCallOff() {
+      const proj = document.getElementById('coProject').value;
+      const projectName = PROJECT_NAMES[proj] || proj;
+      const grand = coLineItems.reduce((s, li) => s + li.qty * li.price, 0);
+      const autoApprove = grand <= 500 || coPriority === 'emergency';
+      const newId = autoApprove ? ('FO-' + (1020 + Math.floor(Math.random() * 80))) : ('MR-' + (2040 + Math.floor(Math.random() * 80)));
+      const newFo = {
+        id: newId,
+        project: proj,
+        projectName,
+        status: autoApprove ? 'NEW' : 'PENDING_APPROVAL',
+        priority: coPriority.toUpperCase(),
+        items: coLineItems.filter(li => li.matId && li.qty > 0).map(li => {
+          const m = MATERIALS.find(x => x.id === li.matId);
+          return { sku: li.matId, name: m ? m.name : li.matId, req: li.qty, picked: 0, packed: 0, delivered: 0 };
+        }),
+        source: 'AD_HOC',
+        createdBy: 'Sneha Kumari',
+        createdAt: 'Today · ' + nowTime(),
+        needBy: document.getElementById('coNeedBy').value || 'Tomorrow',
+        notes: '',
+        isMR: !autoApprove,
+        isToday: true,
+        activity: [
+          { who: 'You', when: 'Today, ' + nowTime(), kind: autoApprove ? 'Created' : 'Submitted', body: autoApprove ? 'Ad-Hoc Call-off created (auto-approved)' : 'Awaiting PM approval ($' + grand.toFixed(2) + ')' },
+        ],
+      };
+      STATE.fos.unshift(newFo);
+      showToast(autoApprove ? `FO created · ${newId}` : `Submitted · ${newId} pending approval`, autoApprove ? 'success' : 'info');
+      // Land back on Orders with the right tab
+      if (!autoApprove) orderTab = 'approval';
+      else orderTab = 'today';
+      navStack.length = 0;
+      navStack.push('orders');
+      showScreen('orders');
+    }
+
+    /* ============================================================
+       SCREEN 6: CONFIRM DELIVERY
+       ============================================================ */
+    let activeShipmentForDelivery = null;
+    let deliveryLines = []; // [{ sku, name, qty, status: 'received'|'issue'|null, issueType, note }]
+
+    function renderDelivery() {
+      const fo = STATE.fos.find(f => f.id === activeFoId);
+      const sh = activeShipmentForDelivery;
+      if (!fo || !sh) return;
+      document.getElementById('cdSub').textContent = `${sh.id} · ${fo.id}`;
+      // Seed lines once per delivery
+      if (!deliveryLines.length || deliveryLines._foId !== fo.id) {
+        deliveryLines = fo.items.map(it => ({ sku: it.sku, name: it.name, qty: it.packed || it.req, status: null, issueType: '', note: '' }));
+        deliveryLines._foId = fo.id;
+      }
+      const body = `
+        <div class="items-table" style="margin-bottom: 14px;">
+          <div class="items-table-hdr">
+            <div>
+              <div class="items-table-title">${sh.id}</div>
+              <div class="items-table-sub">${fo.projectName} · Driver ${sh.driver || '—'}</div>
+            </div>
+            ${statusPillFor('IN_TRANSIT')}
+          </div>
+          <div style="padding: 12px 14px;">
+            <div class="kv-grid">
+              <span class="k">FO</span><span class="v">${fo.id}</span>
+              <span class="k">Drop address</span><span class="v">${sh.address || '—'}</span>
+              <span class="k">Dispatched</span><span class="v">${sh.dispatchedAt}</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="font-size: 12px; color: var(--text-sub); font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 8px;">Items received</div>
+        ${deliveryLines.map((d, idx) => renderDeliveryLine(d, idx)).join('')}
+
+        <div style="font-size: 12px; color: var(--text-sub); font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; margin: 18px 0 8px;">Signature</div>
+        <div class="sig-pad-wrap" id="sigPadWrap">
+          <canvas id="sigCanvas"></canvas>
+          <span class="sig-placeholder">Tap and drag to sign</span>
+        </div>
+        <div class="sig-actions">
+          <span class="sig-stamp" id="sigStamp">Not signed yet</span>
+          <button class="sig-clear" onclick="clearSignature()">Clear</button>
+        </div>
+
+        <div class="merlin-text-field" style="margin-top: 18px; margin-bottom: 0;">
+          <label class="input-label">Note <span class="optional">optional</span></label>
+          <div class="input-wrapper multiline">
+            <textarea id="cdNote" placeholder="Any general comments for this delivery"></textarea>
+          </div>
+        </div>
+      `;
+      document.getElementById('deliveryBody').innerHTML = body;
+      initSignature();
+      updateConfirmBtn();
+    }
+
+    function renderDeliveryLine(d, idx) {
+      const issueTypes = ['Damaged', 'Missing', 'Loss', 'Wrong Item', 'Over Delivery', 'Substitution'];
+      const cls = d.status === 'received' ? 'received' : d.status === 'issue' ? 'issue' : '';
+      return `
+        <div class="deliv-item ${cls}">
+          <div class="di-head">
+            <div class="di-info">
+              <div class="di-name">${d.name}</div>
+              <div class="di-qty">SKU ${d.sku} · ${d.qty} units</div>
+            </div>
+            <div class="di-status-seg">
+              <button class="received ${d.status === 'received' ? 'active' : ''}" onclick="setDeliveryStatus(${idx}, 'received')">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> OK
+              </button>
+              <button class="issue ${d.status === 'issue' ? 'active' : ''}" onclick="setDeliveryStatus(${idx}, 'issue')">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Issue
+              </button>
+            </div>
+          </div>
+          <div class="di-issue-detail">
+            <div class="merlin-dropdown" style="margin-bottom: 8px;">
+              <label class="input-label">Issue type</label>
+              <div class="input-wrapper">
+                <select onchange="setIssueType(${idx}, this.value)">
+                  <option value="" ${!d.issueType ? 'selected' : ''} disabled>Select</option>
+                  ${issueTypes.map(t => `<option value="${t}" ${d.issueType === t ? 'selected' : ''}>${t}</option>`).join('')}
+                </select>
+                <svg class="suffix-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+              </div>
+            </div>
+            <div class="merlin-text-field" style="margin-bottom: 0;">
+              <label class="input-label">Note</label>
+              <div class="input-wrapper multiline">
+                <textarea placeholder="Describe the issue" oninput="setIssueNote(${idx}, this.value)">${d.note || ''}</textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function setDeliveryStatus(idx, status) {
+      deliveryLines[idx].status = status;
+      renderDelivery();
+    }
+    function setIssueType(idx, t) {
+      deliveryLines[idx].issueType = t;
+      updateConfirmBtn();
+    }
+    function setIssueNote(idx, n) {
+      deliveryLines[idx].note = n;
+      updateConfirmBtn();
+    }
+    function updateConfirmBtn() {
+      const allSet = deliveryLines.every(d => d.status);
+      const issuesValid = deliveryLines.filter(d => d.status === 'issue').every(d => d.issueType);
+      const allReceived = deliveryLines.every(d => d.status === 'received');
+      const sigOk = allReceived ? sigHasInk : true;
+      document.getElementById('cdConfirmBtn').disabled = !(allSet && issuesValid && sigOk);
+    }
+
+    function submitDelivery() {
+      const fo = STATE.fos.find(f => f.id === activeFoId);
+      const sh = activeShipmentForDelivery;
+      if (!fo || !sh) return;
+      fo.status = 'DELIVERED';
+      fo.items.forEach(it => { it.delivered = it.packed || it.req; });
+      sh.status = 'DELIVERED';
+      sh.deliveredAt = 'Today · ' + nowTime();
+      const issueCount = deliveryLines.filter(d => d.status === 'issue').length;
+      fo.activity.push({ who: 'You', when: 'Today, ' + nowTime(), kind: 'Status changed', body: 'IN_TRANSIT → DELIVERED' });
+      if (issueCount) fo.activity.push({ who: 'You', when: 'Today, ' + nowTime(), kind: 'Delivery issues', body: `${issueCount} item${issueCount > 1 ? 's' : ''} flagged at receipt` });
+      deliveryLines = [];
+      showToast(issueCount ? `Delivered · ${issueCount} issue${issueCount > 1 ? 's' : ''} flagged` : 'Delivery confirmed', issueCount ? 'warning' : 'success');
+      goBack();
+      renderFoDetail();
+    }
+
+    /* ============================================================
+       SCREEN 7: SHIPMENTS
+       ============================================================ */
+    function renderShipments() {
+      const list = STATE.shipments;
+      document.getElementById('shipHdrSub').textContent = `${list.length} shipment${list.length !== 1 ? 's' : ''}`;
+      const root = document.getElementById('shipmentList');
+      if (!list.length) {
+        root.innerHTML = emptyState('shipments', 'No shipments yet', 'When an order is dispatched, a shipment record appears here.');
+        return;
+      }
+      root.innerHTML = list.map(sh => {
+        const totalQty = sh.items.reduce((s, i) => s + i.qty, 0);
+        const statusCfg = {
+          'LOADED': ['gray', 'Loaded'],
+          'IN_TRANSIT': ['feature', 'In Transit'],
+          'DELIVERED': ['green', 'Delivered'],
+        }[sh.status] || ['gray', sh.status];
+        return `
+          <div class="card" onclick="openShipmentSheet('${sh.id}')">
+            <div class="card-row1">
+              <span class="card-id">${sh.id}</span>
+              <span style="color: var(--text-soft);">·</span>
+              <span class="card-sub-id">${sh.foId}</span>
+              <span style="flex:1"></span>
+              <span class="status-pill ${statusCfg[0]}"><span class="dot"></span>${statusCfg[1]}</span>
+            </div>
+            <div class="card-project">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              Driver: <span style="color: var(--text-strong); font-weight: 500;">${sh.driver}</span>
+              <span style="color: var(--text-soft);">·</span>
+              ${sh.items.length} item${sh.items.length !== 1 ? 's' : ''} (${totalQty} qty)
+            </div>
+            <div class="ship-meta-row">
+              <div class="ship-meta-cell">
+                <div class="k">Dispatched</div>
+                <div class="v">${sh.dispatchedAt}</div>
+              </div>
+              <div class="ship-meta-cell">
+                <div class="k">Delivered</div>
+                <div class="v" style="${!sh.deliveredAt ? 'color: var(--text-soft); font-weight: 400;' : ''}">${sh.deliveredAt || 'In transit'}</div>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function openShipmentSheet(id) {
+      const sh = STATE.shipments.find(s => s.id === id);
+      if (!sh) return;
+      const fo = STATE.fos.find(f => f.id === sh.foId);
+      const statusCfg = {
+        'LOADED': ['gray', 'Loaded'],
+        'IN_TRANSIT': ['feature', 'In Transit'],
+        'DELIVERED': ['green', 'Delivered'],
+      }[sh.status] || ['gray', sh.status];
+      const body = `
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom: 12px;">
+          <span class="status-pill ${statusCfg[0]}"><span class="dot"></span>${statusCfg[1]}</span>
+          <span style="color: var(--text-soft); font-size: 12px;">Linked to ${sh.foId}</span>
+        </div>
+        <div class="kv-grid" style="margin-bottom: 16px;">
+          <span class="k">Project</span><span class="v">${sh.project}</span>
+          <span class="k">Driver</span><span class="v">${sh.driver}</span>
+          <span class="k">Address</span><span class="v">${sh.address}</span>
+          <span class="k">Dispatched</span><span class="v">${sh.dispatchedAt}</span>
+          <span class="k">Delivered</span><span class="v">${sh.deliveredAt || '—'}</span>
+        </div>
+        <div style="font-size: 12px; color: var(--text-sub); font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 8px;">Items</div>
+        <div class="items-table" style="margin-bottom: 0;">
+          ${sh.items.map(it => `
+            <div class="item-row" style="padding: 10px 14px;">
+              <div style="display:flex; align-items:center; justify-content:space-between; gap: 10px;">
+                <div style="flex:1; min-width:0;">
+                  <div class="item-name">${it.name}</div>
+                  <div class="item-sku">SKU ${it.sku}</div>
+                </div>
+                <div style="font-size: 14px; font-weight: 700; color: var(--text-strong);">${it.qty}</div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+      openSheet(sh.id, body, fo ? [
+        { label: 'Open FO', cls: 'btn-primary btn-block', onClick: `openFoFromSheet('${fo.id}')` },
+      ] : []);
+    }
+    function openFoFromSheet(id) {
+      closeSheet();
+      openFo(id);
+    }
+
+    /* ============================================================
+       SHEET + TOAST + COMMON UI
+       ============================================================ */
+    function openSheet(title, body, actions = []) {
+      document.getElementById('sheetTitle').textContent = title;
+      document.getElementById('sheetBody').innerHTML = body;
+      const ft = document.getElementById('sheetFooter');
+      if (actions && actions.length) {
+        ft.style.display = 'flex';
+        ft.innerHTML = actions.map(a => `<button class="btn ${a.cls}" style="flex:1" onclick="${a.onClick}">${a.label}</button>`).join('');
+      } else {
+        ft.style.display = 'none';
+        ft.innerHTML = '';
+      }
+      document.getElementById('scrim').classList.add('show');
+      document.getElementById('sheet').classList.add('show');
+    }
+    function closeSheet() {
+      document.getElementById('scrim').classList.remove('show');
+      document.getElementById('sheet').classList.remove('show');
+    }
+
+    let toastTimer;
+    function showToast(msg, type) {
+      const t = document.getElementById('toast');
+      const icon = document.getElementById('toastIcon');
+      t.classList.remove('warning', 'info');
+      if (type === 'warning') {
+        t.classList.add('warning');
+        icon.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>';
+      } else if (type === 'info') {
+        t.classList.add('info');
+        icon.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>';
+      } else {
+        icon.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+      }
+      document.getElementById('toastMsg').textContent = msg;
+      t.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
+    }
+
+    function toggleSection(id) {
+      document.getElementById(id).classList.toggle('collapsed');
+    }
+
+    function emptyState(kind, title, sub) {
+      const icons = {
+        picks: '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>',
+        orders: '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>',
+        shipments: '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>',
+      };
+      return `
+        <div class="empty-state">
+          <div class="empty-illus">${icons[kind] || ''}</div>
+          <div class="empty-title">${title}</div>
+          <div class="empty-sub">${sub}</div>
+        </div>
+      `;
+    }
+
+    function titleCase(s) {
+      if (!s) return '';
+      return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
+    }
+
+    function nowTime() {
+      const d = new Date();
+      const h = ((d.getHours() + 11) % 12 + 1);
+      const m = String(d.getMinutes()).padStart(2, '0');
+      const ap = d.getHours() >= 12 ? 'PM' : 'AM';
+      return `${h}:${m} ${ap}`;
+    }
+
+    /* ============================================================
+       SIGNATURE CANVAS
+       ============================================================ */
+    let sigCanvas, sigCtx, sigDrawing = false, sigHasInk = false;
+    function initSignature() {
+      sigCanvas = document.getElementById('sigCanvas');
+      if (!sigCanvas) return;
+      sigHasInk = false;
+      const ratio = window.devicePixelRatio || 1;
+      const W = 318, H = 140;
+      sigCanvas.width = W * ratio;
+      sigCanvas.height = H * ratio;
+      sigCanvas.style.width = '100%';
+      sigCanvas.style.height = '100%';
+      sigCtx = sigCanvas.getContext('2d');
+      sigCtx.scale(ratio, ratio);
+      sigCtx.strokeStyle = '#1A1A1A';
+      sigCtx.lineWidth = 2;
+      sigCtx.lineCap = 'round';
+      sigCtx.lineJoin = 'round';
+      sigCanvas.addEventListener('mousedown', sigStart);
+      sigCanvas.addEventListener('mousemove', sigMove);
+      window.addEventListener('mouseup', sigEnd);
+      sigCanvas.addEventListener('touchstart', sigStart, { passive: false });
+      sigCanvas.addEventListener('touchmove', sigMove, { passive: false });
+      sigCanvas.addEventListener('touchend', sigEnd);
+    }
+    function sigPointer(e) {
+      const r = sigCanvas.getBoundingClientRect();
+      if (e.touches && e.touches[0]) return { x: e.touches[0].clientX - r.left, y: e.touches[0].clientY - r.top };
+      return { x: e.clientX - r.left, y: e.clientY - r.top };
+    }
+    function sigStart(e) {
+      e.preventDefault();
+      if (!sigCtx) return;
+      sigDrawing = true;
+      const p = sigPointer(e);
+      sigCtx.beginPath();
+      sigCtx.moveTo(p.x, p.y);
+    }
+    function sigMove(e) {
+      if (!sigDrawing) return;
+      e.preventDefault();
+      const p = sigPointer(e);
+      sigCtx.lineTo(p.x, p.y);
+      sigCtx.stroke();
+      sigHasInk = true;
+    }
+    function sigEnd() {
+      if (!sigDrawing) return;
+      sigDrawing = false;
+      if (sigHasInk) {
+        document.getElementById('sigPadWrap').classList.add('signed');
+        document.getElementById('sigStamp').textContent = 'Signed at ' + nowTime();
+        document.getElementById('sigStamp').classList.add('signed');
+      }
+      updateConfirmBtn();
+    }
+    function clearSignature() {
+      if (!sigCtx || !sigCanvas) return;
+      sigCtx.clearRect(0, 0, sigCanvas.width, sigCanvas.height);
+      sigHasInk = false;
+      document.getElementById('sigPadWrap').classList.remove('signed');
+      document.getElementById('sigStamp').textContent = 'Not signed yet';
+      document.getElementById('sigStamp').classList.remove('signed');
+      updateConfirmBtn();
+    }
+
+    /* ============================================================
+       INIT
+       ============================================================ */
+    renderPicks();
+    renderOrders();
+    renderShipments();
+  </script>
+</body>
+</html>
